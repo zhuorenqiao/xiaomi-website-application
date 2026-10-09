@@ -1,0 +1,262 @@
+.hero {
+  position: relative;
+  display: flex;
+  height: 460px;
+}
+
+/* ---------- 左侧分类菜单 ---------- */
+.hero__menu {
+  flex: none;
+  width: 234px;
+  background: #fff;
+  border-right: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.hero__menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 20px 0 30px;
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+
+.hero__menu-item > a {
+  font-size: 14px;
+  color: var(--text);
+  transition: color 0.15s var(--ease);
+}
+
+.hero__menu-item > svg {
+  color: var(--text-3);
+  transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.hero__menu-item:hover,
+.hero__menu-item.is-open {
+  background: var(--mi-orange);
+}
+
+.hero__menu-item:hover > a,
+.hero__menu-item.is-open > a {
+  color: #fff;
+}
+
+.hero__menu-item:hover > svg,
+.hero__menu-item.is-open > svg {
+  color: #fff;
+  transform: translateX(2px);
+}
+
+/* ---------- 悬停展开面板 ---------- */
+.hero__flyout {
+  position: absolute;
+  left: 234px;
+  top: 0;
+  width: calc(100% - 234px);
+  height: 100%;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  padding: 34px 48px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 18px 44px;
+  z-index: 6;
+}
+
+.hero__flyout a {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1;
+  transition: color 0.15s var(--ease);
+}
+
+.hero__flyout a:hover {
+  color: var(--mi-orange);
+}
+
+/* ---------- 轮播 ---------- */
+.hero__banner {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 460px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.hero__slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s var(--ease), visibility 0.6s;
+}
+
+.hero__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hero__slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 42%, rgba(0, 0, 0, 0) 62%);
+  z-index: 1;
+}
+
+.hero__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__copy {
+  position: absolute;
+  z-index: 2;
+  left: 7%;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 420px;
+  color: #fff;
+}
+
+.hero__eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.35em;
+  opacity: 0.85;
+  margin-bottom: 14px;
+}
+
+.hero__title {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hero__subtitle {
+  margin-top: 10px;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.hero__price {
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff9a4d;
+}
+
+.hero__cta {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 11px 34px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: #fff;
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.hero__slide:hover .hero__cta {
+  background: var(--mi-orange);
+  border-color: var(--mi-orange);
+}
+
+/* ---------- 箭头 ---------- */
+.hero__arrow {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.hero__arrow--prev {
+  left: 0;
+}
+
+.hero__arrow--next {
+  right: 0;
+}
+
+.hero__banner:hover .hero__arrow {
+  opacity: 1;
+}
+
+.hero__arrow:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- 圆点 ---------- */
+.hero__dots {
+  position: absolute;
+  z-index: 3;
+  right: 24px;
+  bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.hero__dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.hero__dots button.is-active {
+  background: var(--mi-orange);
+  transform: scale(1.2);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .hero {
+    height: 300px;
+  }
+
+  .hero__menu {
+    display: none;
+  }
+
+  .hero__banner {
+    height: 300px;
+  }
+
+  .hero__title {
+    font-size: 26px;
+  }
+
+  .hero__subtitle {
+    font-size: 13px;
+  }
+
+  .hero__eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .hero__price {
+    margin-top: 8px;
+    font-size: 15px;
+  }
+
+  .hero__cta {
+    margin-top: 14px;
+    padding: 8px 22px;
+  }
+}

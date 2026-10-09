@@ -1,0 +1,70 @@
+# cert-manager 配置示例：自动签发并续期 xiaomi-website 的 TLS 证书
+#
+# 一、安装 cert-manager（CRD 较大，必须 server-side apply，否则报 annotation 超限）：
+#   kubectl apply --server-side=true -f \
+#     https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
+#   kubectl wait --for=condition=Available --all -n cert-manager deployment --timeout=180s
+#
+# 二、应用本文件：
+#   kubectl apply -f cert-manager.yaml
+#
+# 说明：
+# - secretName 与 k8s.yaml 中 Gateway 的 certificateRefs 保持一致（xiaomi-website-tls），
+#   应用本文件后证书由 cert-manager 全权管理（签发 + 到期前自动续期）
+# - 首次接管前可删除手动创建的旧 Secret：kubectl delete secret xiaomi-website-tls
+# - 本地 kind 环境用 selfsigned 签发：xiaomi.example.com 是 IANA 保留域名，
+#   无法通过 Let's Encrypt 的 ACME 校验
+# - 生产环境把 issuerRef 切换到 letsencrypt（下方注释示例），
+#   前提：域名公网解析 + 80 端口经 Gateway 暴露（HTTP-01 挑战）
+
+# ---------- 本地：自签 ClusterIssuer ----------
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned
+spec:
+  selfSigned: {}
+---
+# ---------- 生产示例：Let's Encrypt（Gateway API HTTP-01 挑战）----------
+# apiVersion: cert-manager.io/v1
+# kind: ClusterIssuer
+# metadata:
+#   name: letsencrypt
+# spec:
+#   acme:
+#     server: https://acme-v02.api.letsencrypt.org/directory
+#     email: admin@example.com          # 改为真实邮箱，用于到期提醒
+#     privateKeySecretRef:
+#       name: letsencrypt-account-key   # ACME 账户私钥存放的 Secret
+#     solvers:
+#       - http01:
+#           gatewayHTTPRoute:           # 通过 Gateway API 完成挑战（cert-manager >= 1.14）
+#             parentRefs:
+#               - name: xiaomi-website  # 复用 k8s.yaml 里的 Gateway
+#                 namespace: default
+#         # 选填：把挑战流量限定在 acme 路径
+#         # selector:
+#         #   dnsNames:
+#         #     - xiaomi.example.com
+---
+# ---------- Certificate：签发并自动续期 Gateway 引用的 Secret ----------
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: xiaomi-website
+  namespace: default                   # 必须与 Gateway 同命名空间
+spec:
+  secretName: xiaomi-website-tls       # 与 Gateway certificateRefs 一致
+  duration: 2160h                      # 证书有效期 90 天
+  renewBefore: 360h                    # 到期前 15 天自动续期
+  subject:
+    organizations:
+      - xiaomi-website
+  privateKey:
+    rotationPolicy: Always             # 续期时更换私钥
+  dnsNames:
+    - xiaomi.example.com               # 多域名/泛域名在此追加
+  issuerRef:
+    name: selfsigned                   # 生产改为 letsencrypt
+    kind: ClusterIssuer
+    group: cert-manager.io
