@@ -1,0 +1,126 @@
+# 小米商城前端 K8s 部署配置
+# 配合 Dockerfile 构建的镜像使用：docker build -t xiaomi-website .
+# 本地快速验证：kubectl apply -f k8s.yaml
+# 注意：若镜像推送到镜像仓库，请修改 image 字段并设置 imagePullPolicy: Always
+
+# ---------- Deployment：无状态应用 ----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xiaomi-website
+  labels:
+    app: xiaomi-website
+spec:
+  replicas: 2
+  # 滚动更新：先起 1 个新 Pod 再停 1 个旧 Pod，保证发布期间服务不断
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: xiaomi-website
+  template:
+    metadata:
+      labels:
+        app: xiaomi-website
+    spec:
+      containers:
+        - name: nginx
+          image: xiaomi-website:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          # 健康检查复用 nginx.conf 中的 /healthz 端点
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # nginx 静态站点资源占用很低
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+# ---------- Service：集群内访问入口 ----------
+apiVersion: v1
+kind: Service
+metadata:
+  name: xiaomi-website
+  labels:
+    app: xiaomi-website
+spec:
+  type: ClusterIP
+  selector:
+    app: xiaomi-website
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+# ---------- Gateway API：对外暴露 ----------
+# GatewayClass 通常由具体实现安装；此处以 Envoy Gateway 为例。
+# 若使用 Istio 请改为 gatewayClassName: istio（其 controllerName 为 istio.io/gateway-controller）。
+# 安装实现：kubectl apply -f https://github.com/envoyproxy/gateway/releases/latest/download/install.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: xiaomi-website
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+    - name: https
+      port: 443
+      protocol: HTTPS
+      # TLS 在 Gateway 终结（外部 HTTPS → 内部仍走 HTTP）
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: xiaomi-website-tls
+# Secret 需预先创建，本地自签示例：
+#   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+#     -keyout tls.key -out tls.crt \
+#     -subj "/CN=xiaomi.example.com" -addext "subjectAltName=DNS:xiaomi.example.com"
+#   kubectl create secret tls xiaomi-website-tls --cert=tls.crt --key=tls.key
+# 生产环境推荐用 cert-manager 自动签发续期，见 cert-manager.yaml（切换 issuerRef 即可）
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: xiaomi-website
+spec:
+  parentRefs:
+    - name: xiaomi-website   # 绑定到上面的 Gateway
+  hostnames:
+    - xiaomi.example.com     # 按实际域名修改；本地测试用 --resolve 或 /etc/hosts
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: xiaomi-website
+          port: 80
