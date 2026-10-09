@@ -4,7 +4,8 @@
  */
 
 // 聊天接口地址：可通过 .env.local 的 VITE_CHAT_API_URL 覆盖（本地联调用）
-export const CHAT_API_URL = import.meta.env?.VITE_CHAT_API_URL || 'https://api.example.com/chat';
+// 兜底值指向本地后端 back/xiaomi-chat-service（application.yml 端口 8860，接口 POST /chat）
+export const CHAT_API_URL = import.meta.env?.VITE_CHAT_API_URL || 'http://localhost:8860/chat';
 
 /** 请求建立超时（毫秒） */
 export const REQUEST_TIMEOUT = 15000;
