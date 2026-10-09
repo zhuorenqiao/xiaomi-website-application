@@ -46,6 +46,8 @@
  * @property {string} key 会话唯一标识
  * @property {string} label 会话标题
  * @property {number} createdAt 创建时间戳
+ * @property {boolean} [pinned] 是否置顶
+ * @property {number} [pinnedAt] 置顶时间戳（多个置顶会话之间按此倒序）
  */
 
 export {};

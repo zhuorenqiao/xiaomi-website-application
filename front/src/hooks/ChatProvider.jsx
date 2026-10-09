@@ -157,6 +157,27 @@ export default function ChatProvider({ children }) {
     [abort, activeId, isRequesting],
   );
 
+  /** 重命名会话（清空输入时回退为默认标题） */
+  const renameSession = useCallback((key, label) => {
+    if (!key) return;
+    const text = (label ?? '').trim();
+    setSessions((prev) =>
+      prev.map((item) => (item.key === key ? { ...item, label: text || DEFAULT_SESSION_LABEL } : item)),
+    );
+  }, []);
+
+  /** 置顶 / 取消置顶 */
+  const togglePin = useCallback((key) => {
+    if (!key) return;
+    setSessions((prev) =>
+      prev.map((item) =>
+        item.key === key
+          ? { ...item, pinned: !item.pinned, pinnedAt: !item.pinned ? Date.now() : undefined }
+          : item,
+      ),
+    );
+  }, []);
+
   const value = useMemo(
     () => ({
       sessions,
@@ -169,8 +190,23 @@ export default function ChatProvider({ children }) {
       newConversation,
       switchSession,
       removeSession,
+      renameSession,
+      togglePin,
     }),
-    [sessions, activeId, messages, isRequesting, send, stop, retry, newConversation, switchSession, removeSession],
+    [
+      sessions,
+      activeId,
+      messages,
+      isRequesting,
+      send,
+      stop,
+      retry,
+      newConversation,
+      switchSession,
+      removeSession,
+      renameSession,
+      togglePin,
+    ],
   );
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

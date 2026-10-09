@@ -3,11 +3,14 @@
  * 消息数据全部来自 useChat（ChatProvider），本组件只做渲染与交互。
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { App as AntdApp, Avatar, Button } from 'antd';
+import { App as AntdApp, Avatar, Button, Input, Modal } from 'antd';
 import {
   CustomerServiceOutlined,
   DeleteOutlined,
+  EditOutlined,
   PlusOutlined,
+  PushpinFilled,
+  PushpinOutlined,
   QuestionCircleOutlined,
   RobotOutlined,
   ShoppingOutlined,
@@ -38,9 +41,14 @@ export default function ChatPanel() {
     newConversation,
     switchSession,
     removeSession,
+    renameSession,
+    togglePin,
   } = useChat();
   const [inputValue, setInputValue] = useState('');
-  const { message: antdMessage } = AntdApp.useApp();
+  // 重命名弹窗目标（{ key, label }），null 表示关闭
+  const [renameTarget, setRenameTarget] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
+  const { message: antdMessage, modal: antdModal } = AntdApp.useApp();
 
   // 错误提示：气泡内已展示错误态，全局 toast 提醒一次
   const toastedRef = useRef(new Set());
@@ -55,11 +63,19 @@ export default function ChatPanel() {
     });
   }, [messages, antdMessage]);
 
-  // 会话列表数据（附删除菜单）
-  const conversationItems = useMemo(
-    () => sessions.map(({ key, label }) => ({ key, label })),
-    [sessions],
-  );
+  // 会话列表数据：置顶在前（按置顶时间倒序），其余保持原有顺序；置顶项带图钉标记
+  const conversationItems = useMemo(() => {
+    const sorted = [...sessions].sort((a, b) => {
+      if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      if (a.pinned && b.pinned) return (b.pinnedAt ?? 0) - (a.pinnedAt ?? 0);
+      return 0;
+    });
+    return sorted.map(({ key, label, pinned }) => ({
+      key,
+      label,
+      icon: pinned ? <PushpinFilled className="chat-conv-pin" /> : undefined,
+    }));
+  }, [sessions]);
 
   // useXChat 消息 → Bubble.List 数据项
   // error/aborted 通过 extraInfo 传给 footer；重试用的 query 取“最近一条用户消息”，
@@ -148,6 +164,49 @@ export default function ChatPanel() {
     setInputValue('');
   };
 
+  /** 提交重命名 */
+  const handleRenameOk = () => {
+    if (!renameTarget) return;
+    renameSession(renameTarget.key, renameValue);
+    setRenameTarget(null);
+  };
+
+  /** 会话操作菜单：置顶（取消置顶）/ 重命名 / 删除（二次确认） */
+  const menuBuilder = (conversation) => {
+    const pinned = !!sessions.find((item) => item.key === conversation.key)?.pinned;
+    return {
+      items: [
+        pinned
+          ? { key: 'unpin', icon: <PushpinFilled />, label: '取消置顶' }
+          : { key: 'pin', icon: <PushpinOutlined />, label: '置顶' },
+        { key: 'rename', icon: <EditOutlined />, label: '重命名' },
+        { key: 'delete', danger: true, icon: <DeleteOutlined />, label: '删除会话' },
+      ],
+      onClick: ({ key }) => {
+        if (key === 'rename') {
+          setRenameTarget({ key: conversation.key, label: conversation.label });
+          setRenameValue(conversation.label ?? '');
+        } else if (key === 'pin' || key === 'unpin') {
+          togglePin(conversation.key);
+        } else if (key === 'delete') {
+          confirmRemoveSession(conversation.key, conversation.label);
+        }
+      },
+    };
+  };
+
+  /** 删除会话二次确认 */
+  const confirmRemoveSession = (key, label) => {
+    antdModal.confirm({
+      title: '删除会话',
+      content: `确定删除「${label || '该会话'}」吗？删除后聊天记录无法恢复。`,
+      okText: '删除',
+      okButtonProps: { danger: true },
+      cancelText: '取消',
+      onOk: () => removeSession(key),
+    });
+  };
+
   return (
     <div className="chat-panel">
       <aside className="chat-panel__side">
@@ -159,14 +218,29 @@ export default function ChatPanel() {
           items={conversationItems}
           activeKey={activeId}
           onActiveChange={switchSession}
-          menu={(conversation) => ({
-            items: [{ key: 'delete', danger: true, icon: <DeleteOutlined />, label: '删除会话' }],
-            onClick: ({ key }) => {
-              if (key === 'delete') removeSession(conversation.key);
-            },
-          })}
+          menu={menuBuilder}
         />
       </aside>
+
+      <Modal
+        open={!!renameTarget}
+        title="重命名会话"
+        okText="保存"
+        cancelText="取消"
+        width={400}
+        destroyOnHidden
+        onCancel={() => setRenameTarget(null)}
+        onOk={handleRenameOk}
+      >
+        <Input
+          autoFocus
+          value={renameValue}
+          maxLength={30}
+          placeholder="请输入会话名称"
+          onChange={(e) => setRenameValue(e.target.value)}
+          onPressEnter={handleRenameOk}
+        />
+      </Modal>
 
       <section className="chat-panel__main">
         {messages.length === 0 ? (

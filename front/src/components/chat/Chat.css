@@ -107,6 +107,12 @@
   overflow-y: auto;
 }
 
+/* 置顶会话的图钉标记 */
+.chat-conv-pin {
+  color: #ff6700;
+  font-size: 13px;
+}
+
 .chat-panel__main {
   flex: 1;
   min-width: 0;
