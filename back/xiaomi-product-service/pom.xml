@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.xiaomi</groupId>
+    <artifactId>xiaomi-backend</artifactId>
+    <version>1.0.0</version>
+  </parent>
+
+  <artifactId>xiaomi-product-service</artifactId>
+  <name>xiaomi-product-service</name>
+  <description>小米商品服务：对外提供首页商品栏目与商品列表接口（GET /api/products/sections）</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.xiaomi</groupId>
+      <artifactId>xiaomi-product-api</artifactId>
+    </dependency>
+    <!-- Spring Boot 4 起 starter-web 改名为 starter-webmvc（旧名已废弃） -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

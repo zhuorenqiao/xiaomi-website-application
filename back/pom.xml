@@ -21,6 +21,8 @@
   <modules>
     <module>xiaomi-chat-api</module>
     <module>xiaomi-chat-service</module>
+    <module>xiaomi-product-api</module>
+    <module>xiaomi-product-service</module>
   </modules>
 
   <properties>
@@ -35,6 +37,11 @@
       <dependency>
         <groupId>com.xiaomi</groupId>
         <artifactId>xiaomi-chat-api</artifactId>
+        <version>${xiaomi-backend.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.xiaomi</groupId>
+        <artifactId>xiaomi-product-api</artifactId>
         <version>${xiaomi-backend.version}</version>
       </dependency>
     </dependencies>

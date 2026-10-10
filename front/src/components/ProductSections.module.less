@@ -1,0 +1,25 @@
+/* ---------- 商品栏目容器的加载 / 错误态 ---------- */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 40px auto;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.retry {
+  padding: 8px 22px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+
+  &:hover {
+    color: var(--mi-orange);
+    border-color: var(--mi-orange);
+  }
+}

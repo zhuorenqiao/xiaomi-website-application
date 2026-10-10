@@ -1,0 +1,14 @@
+server:
+  port: 8861
+
+spring:
+  application:
+    name: xiaomi-product-server
+
+# 商品服务配置
+product:
+  cors:
+    # 前端开发服务器来源；生产环境请改为实际域名
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
