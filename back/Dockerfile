@@ -1,7 +1,9 @@
 # syntax=docker/dockerfile:1
 
 # ---------- 阶段 1：Maven 构建（.mvn/settings.xml 使用阿里云镜像加速依赖下载） ----------
-FROM maven:3.9-eclipse-temurin-17 AS builder
+
+    
+FROM maven:3.9-eclipse-temurin-25 AS builder
 
 WORKDIR /build
 
@@ -18,7 +20,7 @@ COPY xiaomi-chat-service/src xiaomi-chat-service/src
 RUN mvn -q -DskipTests package
 
 # ---------- 阶段 2：JRE 运行时 ----------
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 

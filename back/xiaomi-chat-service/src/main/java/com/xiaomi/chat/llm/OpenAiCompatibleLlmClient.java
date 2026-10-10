@@ -1,7 +1,5 @@
 package com.xiaomi.chat.llm;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -15,6 +13,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * OpenAI 兼容协议的大模型流式客户端（JDK HttpClient 实现，无额外依赖）。
@@ -29,12 +29,12 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
     private static final Logger log = LoggerFactory.getLogger(OpenAiCompatibleLlmClient.class);
 
     private final LlmProperties properties;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final HttpClient httpClient;
 
-    public OpenAiCompatibleLlmClient(LlmProperties properties, ObjectMapper objectMapper) {
+    public OpenAiCompatibleLlmClient(LlmProperties properties, JsonMapper jsonMapper) {
         this.properties = properties;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
@@ -66,7 +66,7 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + properties.apiKey())
                 .POST(HttpRequest.BodyPublishers.ofString(
-                        objectMapper.writeValueAsString(body), StandardCharsets.UTF_8))
+                        jsonMapper.writeValueAsString(body), StandardCharsets.UTF_8))
                 .build();
 
         long start = System.currentTimeMillis();
@@ -109,14 +109,14 @@ public class OpenAiCompatibleLlmClient implements LlmClient {
     /** 解析 OpenAI chunk 的 choices[0].delta.content；无内容（如仅 reasoning/usage 的块）返回 null */
     private String parseDelta(String data) {
         try {
-            JsonNode node = objectMapper.readTree(data);
+            JsonNode node = jsonMapper.readTree(data);
             JsonNode delta = node.path("choices").path(0).path("delta").path("content");
-            if (delta.isTextual()) {
-                return delta.asText();
+            if (delta.isString()) {
+                return delta.stringValue();
             }
             // 兜底：部分兼容服务把整段内容放在 message.content
             JsonNode message = node.path("choices").path(0).path("message").path("content");
-            return message.isTextual() ? message.asText() : null;
+            return message.isString() ? message.stringValue() : null;
         } catch (Exception e) {
             log.debug("skip unparsable llm chunk: {}", data);
             return null;

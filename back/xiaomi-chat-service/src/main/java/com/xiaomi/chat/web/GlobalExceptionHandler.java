@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理：参数校验失败等返回结构化 JSON 错误。
@@ -34,6 +35,13 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .orElse("请求参数不正确");
         return error(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /** 未映射路径 / 静态资源不存在：单独返回 404，避免被下方兜底分支误报成服务端错误 */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NoResourceFoundException e) {
+        log.debug("no resource for {} {}", e.getHttpMethod(), e.getResourcePath());
+        return error(HttpStatus.NOT_FOUND, "接口不存在");
     }
 
     /** 兜底：未预期异常 */

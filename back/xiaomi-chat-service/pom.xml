@@ -19,9 +19,10 @@
       <groupId>com.xiaomi</groupId>
       <artifactId>xiaomi-chat-api</artifactId>
     </dependency>
+    <!-- Spring Boot 4 起 starter-web 改名为 starter-webmvc（旧名已废弃） -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
