@@ -8,12 +8,12 @@
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 22px;
-}
 
-.psection__head h2 {
-  font-size: 22px;
-  font-weight: 200;
-  color: var(--text);
+  h2 {
+    font-size: 22px;
+    font-weight: 200;
+    color: var(--text);
+  }
 }
 
 .psection__more {
@@ -23,11 +23,11 @@
   font-size: 14px;
   color: var(--text-2);
   transition: color 0.2s var(--ease), gap 0.2s var(--ease);
-}
 
-.psection__more:hover {
-  color: var(--mi-orange);
-  gap: 9px;
+  &:hover {
+    color: var(--mi-orange);
+    gap: 9px;
+  }
 }
 
 /* ---------- 左大图 + 4×2 卡片 ---------- */
@@ -44,25 +44,33 @@
   display: block;
   overflow: hidden;
   background: var(--ink-900);
-}
 
-.psection__feature img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
-}
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
+  }
 
-.psection__feature::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.72) 100%);
-  transition: opacity 0.3s var(--ease);
-}
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.72) 100%);
+    transition: opacity 0.3s var(--ease);
+  }
 
-.psection__feature:hover img {
-  transform: scale(1.05);
+  &:hover {
+    img {
+      transform: scale(1.05);
+    }
+
+    .psection__feature-cta {
+      color: var(--mi-orange);
+      border-color: var(--mi-orange);
+      gap: 9px;
+    }
+  }
 }
 
 .psection__feature-copy {
@@ -72,17 +80,17 @@
   right: 22px;
   bottom: 24px;
   color: #fff;
-}
 
-.psection__feature-copy h3 {
-  font-size: 19px;
-  font-weight: 600;
-}
+  h3 {
+    font-size: 19px;
+    font-weight: 600;
+  }
 
-.psection__feature-copy p {
-  margin-top: 6px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  p {
+    margin-top: 6px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.78);
+  }
 }
 
 .psection__feature-price {
@@ -103,12 +111,6 @@
   transition: color 0.2s var(--ease), border-color 0.2s var(--ease), gap 0.2s var(--ease);
 }
 
-.psection__feature:hover .psection__feature-cta {
-  color: var(--mi-orange);
-  border-color: var(--mi-orange);
-  gap: 9px;
-}
-
 /* ---------- 商品卡片 ---------- */
 .pcard {
   position: relative;
@@ -120,12 +122,12 @@
   background: #fff;
   min-width: 0;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
-}
 
-.pcard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
-  z-index: 1;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    z-index: 1;
+  }
 }
 
 .pcard__tag {
@@ -143,12 +145,12 @@
   height: 150px;
   width: 100%;
   margin-bottom: 22px;
-}
 
-.pcard__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
 .pcard__name {
@@ -210,4 +212,3 @@
     margin-bottom: 14px;
   }
 }
-

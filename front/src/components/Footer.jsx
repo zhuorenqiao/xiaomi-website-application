@@ -7,7 +7,7 @@ import {
   IconPin,
   IconHeadset,
 } from './Icons.jsx'
-import './Footer.css'
+import styles from './Footer.module.less'
 
 const serviceIcons = {
   wrench: IconWrench,
@@ -19,12 +19,12 @@ const serviceIcons = {
 
 export default function Footer() {
   return (
-    <footer className="footer" id="service">
-      <div className="container footer__services">
+    <footer className={styles.footer} id="service">
+      <div className={`container ${styles.footerServices}`}>
         {serviceItems.map(({ icon, text }) => {
           const Icon = serviceIcons[icon]
           return (
-            <div className="footer__service" key={text}>
+            <div className={styles.footerService} key={text}>
               <Icon width={26} height={26} />
               <span>{text}</span>
             </div>
@@ -32,10 +32,10 @@ export default function Footer() {
         })}
       </div>
 
-      <div className="container footer__main">
-        <nav className="footer__columns" aria-label="页脚导航">
+      <div className={`container ${styles.footerMain}`}>
+        <nav className={styles.footerColumns} aria-label="页脚导航">
           {footerColumns.map((col) => (
-            <div className="footer__column" key={col.title}>
+            <div className={styles.footerColumn} key={col.title}>
               <h4>{col.title}</h4>
               <ul>
                 {col.links.map((link) => (
@@ -48,26 +48,26 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div className="footer__hotline">
+        <div className={styles.footerHotline}>
           <IconHeadset width={28} height={28} />
-          <p className="footer__phone">{hotline.phone}</p>
-          <p className="footer__hours">{hotline.hours}</p>
-          <p className="footer__hours">{hotline.sub}</p>
-          <div className="footer__buttons">
-            <a className="footer__btn footer__btn--primary" href="#top">
+          <p className={styles.footerPhone}>{hotline.phone}</p>
+          <p className={styles.footerHours}>{hotline.hours}</p>
+          <p className={styles.footerHours}>{hotline.sub}</p>
+          <div className={styles.footerButtons}>
+            <a className={`${styles.footerBtn} ${styles.footerBtnPrimary}`} href="#top">
               {hotline.buttons[0]}
             </a>
-            <a className="footer__btn" href="#top">
+            <a className={styles.footerBtn} href="#top">
               {hotline.buttons[1]}
             </a>
           </div>
         </div>
       </div>
 
-      <div className="footer__bottom">
-        <div className="container footer__bottom-inner">
-          <span className="footer__wordmark">mi.com</span>
-          <div className="footer__icp">
+      <div className={styles.footerBottom}>
+        <div className={`container ${styles.footerBottomInner}`}>
+          <span className={styles.footerWordmark}>mi.com</span>
+          <div className={styles.footerIcp}>
             <p>
               {icpLinks.map((text) => (
                 <a key={text} href="#top">

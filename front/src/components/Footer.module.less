@@ -19,11 +19,11 @@
   gap: 10px;
   font-size: 15px;
   color: var(--text);
-}
 
-.footer__service svg {
-  color: var(--text-2);
-  flex: none;
+  svg {
+    color: var(--text-2);
+    flex: none;
+  }
 }
 
 /* ---------- 链接栏目 + 客服热线 ---------- */
@@ -40,27 +40,29 @@
   gap: 24px;
 }
 
-.footer__column h4 {
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--text);
-  margin-bottom: 16px;
-}
+.footer__column {
+  h4 {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
 
-.footer__column ul {
-  display: flex;
-  flex-direction: column;
-}
+  ul {
+    display: flex;
+    flex-direction: column;
+  }
 
-.footer__column a {
-  font-size: 12px;
-  line-height: 2.2;
-  color: var(--text-2);
-  transition: color 0.2s var(--ease);
-}
+  a {
+    font-size: 12px;
+    line-height: 2.2;
+    color: var(--text-2);
+    transition: color 0.2s var(--ease);
 
-.footer__column a:hover {
-  color: var(--mi-orange);
+    &:hover {
+      color: var(--mi-orange);
+    }
+  }
 }
 
 .footer__hotline {
@@ -70,11 +72,11 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-}
 
-.footer__hotline > svg {
-  color: var(--text-3);
-  margin-bottom: 4px;
+  > svg {
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
 }
 
 .footer__phone {
@@ -110,11 +112,11 @@
   background: var(--mi-orange);
   border-color: var(--mi-orange);
   color: #fff;
-}
 
-.footer__btn--primary:hover {
-  background: var(--mi-orange-dark);
-  border-color: var(--mi-orange-dark);
+  &:hover {
+    background: var(--mi-orange-dark);
+    border-color: var(--mi-orange-dark);
+  }
 }
 
 .footer__btn:not(.footer__btn--primary):hover {
@@ -143,25 +145,27 @@
   flex: none;
 }
 
-.footer__icp p {
-  font-size: 12px;
-  line-height: 2;
-  color: var(--text-2);
-}
+.footer__icp {
+  p {
+    font-size: 12px;
+    line-height: 2;
+    color: var(--text-2);
+  }
 
-.footer__icp a {
-  color: var(--text-2);
-  transition: color 0.2s var(--ease);
-}
+  a {
+    color: var(--text-2);
+    transition: color 0.2s var(--ease);
 
-.footer__icp a + a::before {
-  content: '|';
-  margin: 0 10px;
-  color: var(--text-3);
-}
+    & + a::before {
+      content: '|';
+      margin: 0 10px;
+      color: var(--text-3);
+    }
 
-.footer__icp a:hover {
-  color: var(--mi-orange);
+    &:hover {
+      color: var(--mi-orange);
+    }
+  }
 }
 
 /* ---------- 响应式 ---------- */

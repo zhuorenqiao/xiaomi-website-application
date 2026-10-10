@@ -8,7 +8,7 @@ import zhCN from 'antd/locale/zh_CN';
 import { CommentOutlined, RobotOutlined } from '@ant-design/icons';
 import ChatPanel from './ChatPanel.jsx';
 import useChat from '../../hooks/useChat.js';
-import './Chat.css';
+import styles from './Chat.module.less';
 
 const chatTheme = {
   token: {
@@ -29,25 +29,25 @@ export default function ChatWidget() {
 
   return (
     <>
-      <button type="button" className="chat-fab" onClick={handleOpen} aria-label="打开在线客服">
+      <button type="button" className={styles.chatFab} onClick={handleOpen} aria-label="打开在线客服">
         <CommentOutlined />
       </button>
 
       <Drawer
-        className="chat-drawer"
+        className={styles.chatDrawer}
         open={open}
         onClose={() => setOpen(false)}
         size={780}
         styles={{ body: { padding: 0 }, wrapper: { maxWidth: '100vw' } }}
         title={
-          <div className="chat-drawer__title">
-            <span className="chat-drawer__logo">
+          <div className={styles.chatDrawerTitle}>
+            <span className={styles.chatDrawerLogo}>
               <RobotOutlined />
             </span>
             <div>
-              <div className="chat-drawer__name">小米在线客服</div>
-              <div className="chat-drawer__status">
-                <span className="chat-dot" />
+              <div className={styles.chatDrawerName}>小米在线客服</div>
+              <div className={styles.chatDrawerStatus}>
+                <span className={styles.chatDot} />
                 在线 · 智能助手为您服务
               </div>
             </div>

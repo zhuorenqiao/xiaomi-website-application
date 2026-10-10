@@ -1,6 +1,6 @@
 /* =========================================================
    在线客服聊天浮窗（Ant Design X）
-   样式全部收敛在 chat-* 前缀类名下，不影响主页既有样式
+   CSS Module：类名局部化；对 antd 内部类的覆盖统一用 :global()
    ========================================================= */
 
 /* ---------- 悬浮入口按钮 ---------- */
@@ -22,11 +22,11 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
 
-.chat-fab:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 26px rgba(255, 103, 0, 0.45);
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(255, 103, 0, 0.45);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -36,8 +36,10 @@
 }
 
 /* ---------- 抽屉与标题 ---------- */
-.chat-drawer .ant-drawer-body {
-  padding: 0;
+.chat-drawer {
+  :global(.ant-drawer-body) {
+    padding: 0;
+  }
 }
 
 .chat-drawer__title {
@@ -121,17 +123,69 @@
 }
 
 /* ---------- 消息列表 ---------- */
+.chat-panel__listwrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
 .chat-panel__list {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+
+  :global(.ant-bubble-list-scroll-box) {
+    flex: 1;
+    min-height: 0;
+    padding: 16px 18px;
+  }
 }
 
-.chat-panel__list .ant-bubble-list-scroll-box {
-  flex: 1;
-  min-height: 0;
-  padding: 16px 18px;
+/* ---------- 回到底部按钮（底部居中，滚动离开底部时淡入） ---------- */
+.chat-scroll-down {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #ececec;
+  border-radius: 50%;
+  background: #fff;
+  color: #ff6700;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 8px) scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+
+  &:hover {
+    background: #fff5ef;
+    box-shadow: 0 6px 16px rgba(255, 103, 0, 0.22);
+  }
+}
+
+.chat-scroll-down--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-scroll-down {
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
 }
 
 .chat-avatar--ai {
@@ -154,11 +208,19 @@
   display: flex;
   align-items: center;
   gap: 4px;
+
+  :global(.ant-btn-link) {
+    padding: 0 4px;
+    height: auto;
+    font-size: 12px;
+  }
 }
 
 /* 出错/停止且无部分内容时隐藏空气泡主体 */
-.chat-bubble--empty .ant-bubble-content {
-  display: none;
+.chat-bubble--empty {
+  :global(.ant-bubble-content) {
+    display: none;
+  }
 }
 
 .chat-msg-meta--error {
@@ -167,12 +229,6 @@
 
 .chat-msg-stopped {
   color: #b0b0b0;
-}
-
-.chat-msg-meta .ant-btn-link {
-  padding: 0 4px;
-  height: auto;
-  font-size: 12px;
 }
 
 /* ---------- 空状态 ---------- */
