@@ -5,14 +5,22 @@ import styles from './ProductSection.module.less'
  * 首页商品栏目（无状态展示组件）。
  * @param {{ id: string, title: string, feature: object, products: Array[] }} section 栏目数据
  * @param {(section: object) => void} [onViewAll] 「查看全部」回调：进入该分类的商品列表页（分页）
+ * @param {(id: number) => void} [onOpen] 商品点击回调：传入商品主键跳详情页（主推位与网格卡片共用）
  */
-export default function ProductSection({ section, onViewAll }) {
+export default function ProductSection({ section, onViewAll, onOpen }) {
   const { id, title, feature, products } = section
 
   const handleViewAll = (event) => {
     if (!onViewAll) return
     event.preventDefault()
     onViewAll(section)
+  }
+
+  // 卡片 / 主推位点击：拦截默认的 #top 锚点跳转，改走详情路由（未接 onOpen 时保留占位行为）
+  const handleOpen = (productId) => (event) => {
+    if (!onOpen) return
+    event.preventDefault()
+    onOpen(productId)
   }
 
   return (
@@ -25,7 +33,7 @@ export default function ProductSection({ section, onViewAll }) {
       </div>
 
       <div className={styles.psectionRow}>
-        <a className={styles.psectionFeature} href="#top">
+        <a className={styles.psectionFeature} href="#top" onClick={handleOpen(feature.id)}>
           <img src={feature.image} alt={feature.name} loading="lazy" />
           <div className={styles.psectionFeatureCopy}>
             <h3>{feature.name}</h3>
@@ -38,7 +46,7 @@ export default function ProductSection({ section, onViewAll }) {
         </a>
 
         {products.map((p) => (
-          <a className={styles.pcard} href="#top" key={p.name}>
+          <a className={styles.pcard} href="#top" key={p.id} onClick={handleOpen(p.id)}>
             {p.tag && <span className={styles.pcardTag}>{p.tag}</span>}
             <div className={styles.pcardMedia}>
               <img src={p.image} alt={p.name} loading="lazy" />

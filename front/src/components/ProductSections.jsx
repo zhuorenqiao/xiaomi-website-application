@@ -6,8 +6,9 @@ import styles from './ProductSections.module.less'
  * 首页商品栏目容器：从商品微服务拉取列表并渲染，处理加载中 / 失败重试两种状态。
  * 展示逻辑仍由无状态的 ProductSection 负责，本组件只做数据接入与状态编排。
  * @param {(section: object) => void} [onViewAll] 「查看全部」回调，由 App 传入（跳转分类列表页）
+ * @param {(id: number) => void} [onOpen] 商品点击回调，传入商品主键跳详情页
  */
-export default function ProductSections({ onViewAll }) {
+export default function ProductSections({ onViewAll, onOpen }) {
   const { sections, status, reload } = useProducts()
 
   if (status === 'loading') {
@@ -32,7 +33,7 @@ export default function ProductSections({ onViewAll }) {
   return (
     <>
       {sections.map((section) => (
-        <ProductSection key={section.id} section={section} onViewAll={onViewAll} />
+        <ProductSection key={section.id} section={section} onViewAll={onViewAll} onOpen={onOpen} />
       ))}
     </>
   )

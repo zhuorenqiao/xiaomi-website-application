@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * CORS 配置：允许前端开发服务器跨域调用 /api/products（GET）。
+ * CORS 配置：允许前端开发服务器跨域调用商品与购物车接口（商品 GET；购物车 GET/POST/PUT/DELETE）。
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(properties.cors().allowedOrigins().toArray(String[]::new))
-                .allowedMethods("GET", "OPTIONS")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type")
                 .maxAge(3600);
     }

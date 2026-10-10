@@ -55,6 +55,29 @@
     ORDER BY c.list_order ASC, p.list_order ASC, p.id ASC
   </select>
 
+  <!-- 详情页：按主键取单个商品行（列与 ProductRow 自动映射，无命中则返回 null） -->
+  <select id="selectById" resultType="com.xiaomi.product.catalog.ProductRow">
+    <include refid="productColumns"/>
+    WHERE p.id = #{id}
+    LIMIT 1
+  </select>
+
+  <!-- 同类推荐：同分类、排除当前商品、销量高优先 -->
+  <select id="selectRelated" resultType="com.xiaomi.product.catalog.ProductRow">
+    <include refid="productColumns"/>
+    WHERE p.category_code = #{category} AND p.id != #{excludeId}
+    ORDER BY p.sales DESC, p.list_order ASC, p.id ASC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 详情页 SKU：按商品取全部版本/颜色可选项（列与 ProductSkuRow 自动映射） -->
+  <select id="selectSkusByProductId" resultType="com.xiaomi.product.catalog.ProductSkuRow">
+    SELECT s.id, s.version, s.color, s.color_en, s.color_hex, s.price, s.stock, s.list_order
+      FROM product_sku s
+     WHERE s.product_id = #{productId}
+     ORDER BY s.list_order ASC, s.id ASC
+  </select>
+
   <select id="countByCriteria" resultType="long">
     SELECT COUNT(*)
       FROM product p

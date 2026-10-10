@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { topBarLeft, topBarRight, navLinks, searchPlaceholder } from '../data/siteData.js'
 import { IconCart, IconSearch } from './Icons.jsx'
+import useCart from '../hooks/useCart.js'
 import styles from './Navbar.module.less'
 
 /**
  * 顶部导航。
- * @param {{keyword?: string, onSearch?: (keyword: string) => void, onHome?: () => void}} props
- *   keyword       当前地址栏里的搜索词，用于回填搜索框
- *   onSearch      提交搜索（进入商品列表页）
- *   onHome        点 logo 回到首页
+ * 路由改由 react-router 接管：搜索框回填读当前 /search 的 keyword，
+ * 提交跳 /search、点 logo 回 /、点购物车去 /cart，均用 useNavigate / <Link>。
  */
-export default function Navbar({ keyword = '', onSearch, onHome }) {
+export default function Navbar() {
+  const { count } = useCart()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
   const [value, setValue] = useState(keyword)
 
-  // 外部条件变化（如浏览器前进后退）时同步输入框，避免显示与地址栏不一致
+  // 地址栏关键词变化（如浏览器前进后退 / 跳转分类）时同步输入框
   useEffect(() => {
     setValue(keyword)
   }, [keyword])
@@ -22,7 +26,7 @@ export default function Navbar({ keyword = '', onSearch, onHome }) {
     event.preventDefault()
     const trimmed = value.trim()
     if (!trimmed) return
-    onSearch?.(trimmed)
+    navigate(`/search?keyword=${encodeURIComponent(trimmed)}`)
   }
 
   return (
@@ -39,11 +43,15 @@ export default function Navbar({ keyword = '', onSearch, onHome }) {
           <ul className={styles.topbarLinks}>
             {topBarRight.map((label, i) => (
               <li key={label}>
-                <a href="#top">
-                  {i === 3 && <IconCart width={13} height={13} />}
-                  {label}
-                  {i === 3 && '（0）'}
-                </a>
+                {i === 3 ? (
+                  <Link to="/cart">
+                    <IconCart width={13} height={13} />
+                    {label}
+                    {`（${count}）`}
+                  </Link>
+                ) : (
+                  <a href="#top">{label}</a>
+                )}
               </li>
             ))}
           </ul>
@@ -51,18 +59,9 @@ export default function Navbar({ keyword = '', onSearch, onHome }) {
       </div>
 
       <div className={`container ${styles.navbar}`}>
-        <a
-          className={styles.navbarLogo}
-          href="#top"
-          aria-label="小米官网"
-          onClick={(event) => {
-            if (!onHome) return
-            event.preventDefault()
-            onHome()
-          }}
-        >
+        <Link className={styles.navbarLogo} to="/" aria-label="小米官网">
           <img src="/mi-logo.svg" alt="小米" width="56" height="56" />
-        </a>
+        </Link>
 
         <nav className={styles.navbarMenu} aria-label="商品分类">
           {navLinks.map((item) => (
@@ -85,11 +84,11 @@ export default function Navbar({ keyword = '', onSearch, onHome }) {
           </button>
         </form>
 
-        <a className={styles.navbarCart} href="#top">
+        <Link className={styles.navbarCart} to="/cart">
           <IconCart width={16} height={16} />
           购物车
-          <span>（0）</span>
-        </a>
+          <span>（{count}）</span>
+        </Link>
       </div>
     </header>
   )

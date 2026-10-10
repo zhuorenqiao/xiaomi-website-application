@@ -2,6 +2,7 @@ package com.xiaomi.product.mapper;
 
 import com.xiaomi.product.api.SearchFacet;
 import com.xiaomi.product.catalog.ProductRow;
+import com.xiaomi.product.catalog.ProductSkuRow;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,6 +19,16 @@ public interface ProductMapper {
 
     /** 首页用：全部分类的商品行，按分类展示顺序 + 分类内顺序排列 */
     List<ProductRow> selectAllOrdered();
+
+    /** 详情页用：按主键取单个商品行（不存在时返回 null） */
+    ProductRow selectById(@Param("id") long id);
+
+    /** 详情页同类推荐：同分类、排除自身、按销量倒序取前 limit 个 */
+    List<ProductRow> selectRelated(@Param("category") String category, @Param("excludeId") long excludeId,
+            @Param("limit") int limit);
+
+    /** 详情页 SKU：按商品取全部可选项，按展示顺序排列 */
+    List<ProductSkuRow> selectSkusByProductId(@Param("productId") long productId);
 
     /** 命中总数（关键词 + 分类） */
     long countByCriteria(@Param("pattern") String pattern, @Param("category") String category);

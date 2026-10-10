@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, "接口不存在");
     }
 
+    /** 非法入参 / 业务校验不通过（如缺少会话、SKU 不存在）：返回 400 + 可读文案 */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(IllegalArgumentException e) {
+        log.debug("bad request: {}", e.getMessage());
+        return error(HttpStatus.BAD_REQUEST, e.getMessage() == null ? "请求参数不合法" : e.getMessage());
+    }
+
     /** 兜底：未预期异常 */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception e) {

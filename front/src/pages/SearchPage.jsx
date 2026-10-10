@@ -1,8 +1,10 @@
 import { useEffect, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ConfigProvider, Pagination } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import useProductSearch from '../hooks/useProductSearch.js'
-import { PAGE_SIZE_OPTIONS } from '../utils/productConfig.js'
+import useAppNav from '../hooks/useAppNav.js'
+import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from '../utils/productConfig.js'
 import { IconArrowRight } from '../components/Icons.jsx'
 import styles from './SearchPage.module.less'
 
@@ -22,15 +24,24 @@ function formatSales(sales) {
 }
 
 /**
- * 商品搜索 / 分类浏览列表页（路由：?keyword= / ?category=）。
- * 查询条件全部来自地址栏（见 useAppRoute），本组件只负责展示与「改哪个条件」。
- * 与首页共用统一的路由入参，各自取用所需字段。
- *
- * @param {{keyword: string, category: string, sort: string, page: number, size: number}} query 当前查询条件
- * @param {(patch: object) => void} goSearch 局部更新查询条件并留在列表页（切换分类/排序/每页条数时一并把 page 归 1）
- * @param {() => void} goHome 返回首页
+ * 商品搜索 / 分类浏览列表页（路由：/search?keyword= / ?category=）。
+ * 查询条件全部来自地址栏查询串，本组件只负责展示与「改哪个条件」；
+ * 跳详情 / 回首页交给 useAppNav。
  */
-export default function SearchPage({ query, goSearch, goHome }) {
+export default function SearchPage() {
+  const [searchParams] = useSearchParams()
+  const { goSearch, goDetail, goHome } = useAppNav()
+  // 从查询串还原搜索条件：非法页码 / 每页条数都回落到安全默认值
+  const query = useMemo(() => {
+    const size = Number(searchParams.get('size'))
+    return {
+      keyword: (searchParams.get('keyword') || '').trim(),
+      category: (searchParams.get('category') || '').trim(),
+      sort: searchParams.get('sort') || 'default',
+      page: Math.max(1, Number(searchParams.get('page')) || 1),
+      size: PAGE_SIZE_OPTIONS.includes(size) ? size : DEFAULT_PAGE_SIZE,
+    }
+  }, [searchParams])
   const { keyword, category, sort, page, size } = query
   const { result, status, error, retry } = useProductSearch(query)
 
@@ -58,6 +69,12 @@ export default function SearchPage({ query, goSearch, goHome }) {
       return
     }
     goSearch({ sort: value, page: 1 })
+  }
+
+  // 卡片点击：拦截列表页锚点默认行为，改用商品主键跳详情
+  const openDetail = (id) => (event) => {
+    event.preventDefault()
+    goDetail(id)
   }
 
   return (
@@ -154,7 +171,7 @@ export default function SearchPage({ query, goSearch, goHome }) {
           <>
             <div className={`${styles.searchGrid} ${loading ? styles.searchGridLoading : ''}`}>
               {items.map((item) => (
-                <a className={styles.searchCard} href="#search-results" key={`${item.category}-${item.name}`}>
+                <a className={styles.searchCard} href="#search-results" key={item.id} onClick={openDetail(item.id)}>
                   {item.tag ? <span className={styles.searchCardTag}>{item.tag}</span> : null}
                   <div className={styles.searchCardMedia}>
                     <img src={item.image} alt={item.name} loading="lazy" />

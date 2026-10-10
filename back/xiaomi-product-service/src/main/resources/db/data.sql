@@ -140,3 +140,28 @@ VALUES (6001, '小米智能摄像头 5 Pro', '2.5K 云台 · AI 智能看家', N
        (6015, '小米人体传感器 2', '光照感知 · 联动触发', NULL, 'Xiaomi', 59, NULL, 'smarthome', 'tiny white round motion sensor device with mounting bracket', NULL, 0, 162000, 15),
        (6016, '米家投影仪 家用版', '1080P · 自动对焦梯形校正', NULL, '米家', 2299, NULL, 'smarthome', 'compact white home projector with lens facing forward on wooden shelf', NULL, 0, 21600, 16),
        (6017, '小米智能门铃 3', '可视对讲 · 夜视广角', NULL, 'Xiaomi', 349, NULL, 'smarthome', 'white video doorbell with camera and button mounted on door frame', NULL, 0, 47300, 17);
+
+-- ============================================================
+-- 商品 SKU 种子（幂等：唯一键 uk_sku_combo + INSERT IGNORE，重启不会重复灌入）
+-- 为每个商品按「版本 x 颜色」笛卡尔积生成 6 个 SKU；价格按版本比例浮动（升级版 +15%），
+-- 颜色只影响外观与成图 prompt，不改价。需要重灌时先清空 product_sku 再重启商品服务。
+-- ============================================================
+INSERT IGNORE INTO product_sku (product_id, version, color, color_en, color_hex, price, stock, list_order)
+SELECT p.id,
+       v.version,
+       c.color,
+       c.color_en,
+       c.color_hex,
+       ROUND(p.price * v.ratio, 2),
+       v.stock,
+       v.list_order * 10 + c.list_order
+  FROM product p
+  CROSS JOIN (
+    SELECT '标准版' AS version, 1.00 AS ratio, 500 AS stock, 0 AS list_order
+    UNION ALL SELECT '升级版', 1.15, 300, 1
+  ) v
+  CROSS JOIN (
+    SELECT '冰川白' AS color, 'white' AS color_en, '#f5f5f5' AS color_hex, 1 AS list_order
+    UNION ALL SELECT '曜石黑', 'black', '#2b2b2b', 2
+    UNION ALL SELECT '晨雾灰', 'grey', '#c9ccd1', 3
+  ) c;

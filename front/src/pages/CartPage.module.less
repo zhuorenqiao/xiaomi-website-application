@@ -1,0 +1,382 @@
+/* 购物车页（参考 mi.com/shop/buy/cart）：面包屑 + 商品行列表 + 底部结算条 */
+.cart {
+  padding: 18px 0 48px;
+  background: var(--bg-gray);
+}
+
+.inner {
+  display: block;
+}
+
+/* ---------- 面包屑 ---------- */
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+
+  a {
+    color: var(--text-2);
+    transition: color 0.2s var(--ease);
+
+    &:hover {
+      color: var(--mi-orange);
+    }
+  }
+}
+
+/* ---------- 标题 + 件数 ---------- */
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 6px 0 14px;
+}
+
+.head-title {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.head-count {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-2);
+
+  em {
+    padding: 0 3px;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--mi-orange);
+  }
+}
+
+/* ---------- 列表 ---------- */
+.list {
+  background: #fff;
+  border-top: 2px solid var(--mi-orange);
+}
+
+.list--busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px 150px 130px 80px;
+  align-items: center;
+  gap: 12px;
+}
+
+.row-head {
+  padding: 14px 22px;
+  font-size: 13px;
+  color: var(--text-3);
+  background: var(--bg-gray);
+
+  span:last-child {
+    text-align: center;
+  }
+}
+
+.row {
+  border-bottom: 1px solid var(--line);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.row-body {
+  padding: 22px;
+}
+
+/* 商品单元格 */
+.product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.product-media {
+  flex: none;
+  width: 92px;
+  height: 92px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.product-info {
+  min-width: 0;
+}
+
+.product-name {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+  transition: color 0.2s var(--ease);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  &:hover {
+    color: var(--mi-orange);
+  }
+}
+
+.product-sku {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.sku-dot {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.price,
+.subtotal {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.subtotal {
+  font-weight: 600;
+  color: var(--mi-orange);
+}
+
+/* 数量步进 */
+.qty {
+  justify-self: start;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+}
+
+.step-btn {
+  width: 30px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text-2);
+  background: var(--bg-gray);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+
+  &:hover:not(:disabled) {
+    color: var(--mi-orange);
+    background: #ececec;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.step-value {
+  min-width: 44px;
+  font-size: 14px;
+  line-height: 30px;
+  text-align: center;
+  color: var(--text);
+}
+
+/* 操作 */
+.ops {
+  text-align: center;
+}
+
+.remove-btn {
+  font-size: 13px;
+  color: var(--text-3);
+  transition: color 0.2s var(--ease);
+
+  &:hover:not(:disabled) {
+    color: var(--mi-orange);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+/* ---------- 底部结算条 ---------- */
+.checkout {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  margin-top: 14px;
+  background: #fff;
+}
+
+.clear-btn {
+  font-size: 13px;
+  color: var(--text-2);
+  transition: color 0.2s var(--ease);
+
+  &:hover:not(:disabled) {
+    color: var(--mi-orange);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--text-2);
+
+  em {
+    font-style: normal;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--mi-orange);
+  }
+}
+
+.settle-btn {
+  height: 44px;
+  padding: 0 40px;
+  font-size: 16px;
+  color: #fff;
+  background: var(--mi-orange);
+  border: 1px solid var(--mi-orange);
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+
+  &:hover:not(:disabled) {
+    background: var(--mi-orange-dark);
+    border-color: var(--mi-orange-dark);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+.notice {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--mi-orange);
+  text-align: right;
+}
+
+/* ---------- 空态 / 异常态 ---------- */
+.empty,
+.state {
+  padding: 60px 0;
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+  background: #fff;
+}
+
+.state-tip,
+.empty p {
+  margin-top: 8px;
+}
+
+.state-tip {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.state-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.state-btn,
+.state-btn--ghost {
+  height: 34px;
+  padding: 0 22px;
+  font-size: 13px;
+  color: #fff;
+  background: var(--mi-orange);
+  border: 1px solid var(--mi-orange);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+
+  &:hover {
+    background: var(--mi-orange-dark);
+    border-color: var(--mi-orange-dark);
+  }
+}
+
+.state-btn--ghost {
+  color: var(--text-2);
+  background: #fff;
+  border-color: var(--line);
+
+  &:hover {
+    color: var(--mi-orange);
+    background: #fff;
+    border-color: var(--mi-orange);
+  }
+}
+
+/* ---------- 响应式：窄屏隐藏表头，纵向堆叠 ---------- */
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .row-head {
+    display: none;
+  }
+
+  .row-body {
+    padding: 16px;
+  }
+
+  .price::before {
+    content: '单价：';
+    color: var(--text-3);
+  }
+
+  .subtotal::before {
+    content: '小计：';
+    color: var(--text-3);
+  }
+
+  .checkout {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .summary {
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}

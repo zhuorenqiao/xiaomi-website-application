@@ -1,4 +1,4 @@
-import { DEFAULT_PAGE_SIZE, PRODUCT_SEARCH_URL, PRODUCT_SECTIONS_URL } from '../utils/productConfig.js'
+import { DEFAULT_PAGE_SIZE, PRODUCT_SEARCH_URL, PRODUCT_SECTIONS_URL, PRODUCT_DETAIL_URL } from '../utils/productConfig.js'
 
 /**
  * 统一请求 + 解包：后端商品接口一律返回 { success, message?, data }，
@@ -48,4 +48,16 @@ export function searchProducts(query = {}, signal) {
   params.set('page', String(page))
   params.set('size', String(size))
   return getData(`${PRODUCT_SEARCH_URL}?${params.toString()}`, signal)
+}
+
+/**
+ * 获取商品详情（画廊 / 卖点 / 规格参数 / 同类推荐）。
+ * @param {number|string} id 商品主键（来自列表项 item.id）
+ * @param {AbortSignal} [signal] 可选的中止信号
+ * @returns {Promise<object>} ProductDetail 载荷
+ */
+export function fetchProductDetail(id, signal) {
+  const params = new URLSearchParams()
+  params.set('id', String(id))
+  return getData(`${PRODUCT_DETAIL_URL}?${params.toString()}`, signal)
 }

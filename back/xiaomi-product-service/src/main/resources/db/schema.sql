@@ -43,3 +43,42 @@ CREATE TABLE IF NOT EXISTS product (
 
 -- 说明：搜索用 LIKE 匹配（演示级数据量足够），真实商品中心建议改为
 -- InnoDB FULLTEXT（ngram 分词）或外接搜索引擎，此处不引入以保持链路直观。
+
+-- 商品 SKU：一个商品对应「版本 x 颜色」的多个可下单单元，详情页版本/颜色选择与价格联动据此而来
+CREATE TABLE IF NOT EXISTS product_sku (
+    id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    product_id  BIGINT UNSIGNED NOT NULL COMMENT '所属商品',
+    version     VARCHAR(32)     NOT NULL COMMENT '版本 / 规格（如 标准版 / 升级版）',
+    color       VARCHAR(32)     NOT NULL COMMENT '颜色（展示文案，如 曜石黑）',
+    color_en    VARCHAR(32)     NOT NULL COMMENT '颜色英文（拼入成图 prompt，使商品图随颜色变化）',
+    color_hex   VARCHAR(9)      NOT NULL COMMENT '颜色色值（详情页色块展示，如 #2b2b2b）',
+    price       DECIMAL(10, 2)  NOT NULL COMMENT '该 SKU 售价（元）',
+    stock       INT             NOT NULL DEFAULT 0 COMMENT '库存，0 表示无货',
+    list_order  INT             NOT NULL DEFAULT 0 COMMENT 'SKU 展示顺序',
+    created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_sku_combo (product_id, version, color),
+    KEY idx_sku_product (product_id),
+    CONSTRAINT fk_sku_product FOREIGN KEY (product_id) REFERENCES product (id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT '商品 SKU';
+
+-- 购物车项：以「游客会话 id」归组，存 SKU 快照（名称/价格/图片），不随商品改价而回写，链路独立
+CREATE TABLE IF NOT EXISTS cart_item (
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
+    session_id    VARCHAR(64)     NOT NULL COMMENT '游客购物车会话标识（前端 localStorage 生成）',
+    product_id    BIGINT UNSIGNED NOT NULL COMMENT '商品 id',
+    sku_id        BIGINT UNSIGNED NOT NULL COMMENT 'SKU id',
+    product_name  VARCHAR(120)    NOT NULL COMMENT '商品名快照',
+    sku_version   VARCHAR(32)     NOT NULL COMMENT '版本快照',
+    sku_color     VARCHAR(32)     NOT NULL COMMENT '颜色快照',
+    sku_color_hex VARCHAR(9)               DEFAULT NULL COMMENT '颜色色值快照',
+    price         DECIMAL(10, 2)  NOT NULL COMMENT '加入时单价（元）快照',
+    quantity      INT             NOT NULL DEFAULT 1 COMMENT '数量',
+    image         VARCHAR(700)    NOT NULL COMMENT '加入时商品图 URL 快照',
+    created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_cart_session_sku (session_id, sku_id),
+    KEY idx_cart_session (session_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT '购物车项';

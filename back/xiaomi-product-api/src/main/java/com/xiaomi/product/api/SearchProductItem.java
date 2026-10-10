@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * 搜索结果中的单个商品卡片，比首页网格的 {@link ProductItem} 多带品牌与销量，
  * 供搜索页展示「已售 xx 件」以及让销量排序结果可被用户感知。
  *
+ * @param id       商品主键，前端据此跳转详情页（同类推荐复用本类型）
  * @param name     商品名称
  * @param desc     一句话卖点
  * @param price    价格文案（如「6499 元」）
@@ -16,6 +17,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @param category 所属分类名称
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record SearchProductItem(String name, String desc, String price, String tag, String image,
+public record SearchProductItem(long id, String name, String desc, String price, String tag, String image,
         String brand, Integer sales, String category) {
 }

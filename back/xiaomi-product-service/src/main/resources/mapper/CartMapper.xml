@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  购物车 SQL（MySQL）：以 session_id 归组，条目自动映射到 CartItem、快照映射到 SkuSnapshot。
+  约定同 ProductMapper.xml：所有入参走 #{} 预编译；结果列用别名对齐 record 组件名，
+  依赖 map-underscore-to-camel-case 与 arg-name-based-constructor-auto-mapping。
+-->
+<mapper namespace="com.xiaomi.product.mapper.CartMapper">
+
+  <select id="selectBySession" resultType="com.xiaomi.product.api.CartItem">
+    SELECT id, product_id, sku_id, product_name AS name, sku_version AS version,
+           sku_color AS color, sku_color_hex AS color_hex, price, quantity, image
+      FROM cart_item
+     WHERE session_id = #{sessionId}
+     ORDER BY id ASC
+  </select>
+
+  <select id="selectSkuSnapshot" resultType="com.xiaomi.product.catalog.SkuSnapshot">
+    SELECT p.id AS product_id, p.name AS product_name, s.id AS sku_id,
+           s.version, s.color, s.color_en, s.color_hex, s.price, p.image_subject
+      FROM product_sku s
+      JOIN product p ON p.id = s.product_id
+     WHERE s.id = #{skuId}
+  </select>
+
+  <!-- 命中 (session_id, sku_id) 唯一键则把数量累加，否则插入新行 -->
+  <insert id="upsertAdd">
+    INSERT INTO cart_item (session_id, product_id, sku_id, product_name, sku_version,
+                           sku_color, sku_color_hex, price, quantity, image)
+    VALUES (#{sessionId}, #{productId}, #{skuId}, #{productName}, #{version},
+            #{color}, #{colorHex}, #{price}, #{quantity}, #{image})
+    ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+  </insert>
+
+  <update id="updateQuantity">
+    UPDATE cart_item
+       SET quantity = #{quantity}
+     WHERE session_id = #{sessionId} AND sku_id = #{skuId}
+  </update>
+
+  <delete id="deleteItem">
+    DELETE FROM cart_item
+     WHERE session_id = #{sessionId} AND sku_id = #{skuId}
+  </delete>
+
+  <delete id="deleteBySession">
+    DELETE FROM cart_item
+     WHERE session_id = #{sessionId}
+  </delete>
+
+</mapper>

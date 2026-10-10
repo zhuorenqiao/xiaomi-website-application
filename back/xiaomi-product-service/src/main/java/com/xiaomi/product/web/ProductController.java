@@ -1,6 +1,7 @@
 package com.xiaomi.product.web;
 
 import com.xiaomi.product.api.ApiResponse;
+import com.xiaomi.product.api.ProductDetail;
 import com.xiaomi.product.api.ProductSearchResult;
 import com.xiaomi.product.api.ProductSection;
 import com.xiaomi.product.service.ProductQuery;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
  * 商品接口：
  * <ul>
  *   <li>GET /api/products/sections —— 首页商品栏目；</li>
- *   <li>GET /api/products/search —— 关键词搜索 + 分类筛选 + 排序 + 分页的商品列表。</li>
+ *   <li>GET /api/products/search —— 关键词搜索 + 分类筛选 + 排序 + 分页的商品列表；</li>
+ *   <li>GET /api/products/detail —— 单个商品的详情页（画廊 / 卖点 / 规格参数 / 同类推荐）。</li>
  * </ul>
  * 两者数据均来自 MySQL 商品库（back/db/docker-compose.yml）。
  */
@@ -57,5 +59,20 @@ public class ProductController {
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
         return ApiResponse.ok(productService.search(ProductQuery.of(keyword, category, sort, page, size)));
+    }
+
+    /**
+     * 商品详情（参考 mi.com/shop/buy/detail?product_id=）：按主键返回单个商品的详情聚合数据。
+     *
+     * @param id 商品主键；缺失或非数字时返回业务错误，避免依赖容器默认的 400
+     * @return 统一响应外层，{@code data} 为 {@link ProductDetail}；商品不存在时 success=false
+     */
+    @GetMapping("/detail")
+    public ApiResponse<ProductDetail> detail(@RequestParam(name = "id", required = false) Long id) {
+        if (id == null || id <= 0) {
+            return ApiResponse.error("缺少商品编号");
+        }
+        ProductDetail detail = productService.detail(id);
+        return detail == null ? ApiResponse.error("商品不存在") : ApiResponse.ok(detail);
     }
 }

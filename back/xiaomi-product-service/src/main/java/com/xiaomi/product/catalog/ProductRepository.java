@@ -73,6 +73,23 @@ public class ProductRepository {
         return mapper.selectFacets(likePattern(keyword));
     }
 
+    // ---------------- 商品详情 ----------------
+
+    /** 按主键取单个商品行；不存在时返回 null（service 据此回「商品不存在」） */
+    public ProductRow findById(long id) {
+        return mapper.selectById(id);
+    }
+
+    /** 同类推荐：与当前商品同分类、排除自身、销量靠前的 limit 个商品行 */
+    public List<ProductRow> related(String categoryCode, long excludeId, int limit) {
+        return mapper.selectRelated(categoryCode, excludeId, limit);
+    }
+
+    /** 某商品的全部可选 SKU（版本 x 颜色），按展示顺序返回 */
+    public List<ProductSkuRow> findSkus(long productId) {
+        return mapper.selectSkusByProductId(productId);
+    }
+
     // ---------------- 内部辅助 ----------------
 
     /** 关键词转 LIKE 模式；空关键词返回 null，表示 mapper 里不生成该条件 */
@@ -97,11 +114,12 @@ public class ProductRepository {
     }
 
     private ProductFeature toFeature(ProductRow row) {
-        return new ProductFeature(row.name(), row.featureDesc(), row.featurePriceText(), "了解更多",
+        return new ProductFeature(row.id(), row.name(), row.featureDesc(), row.featurePriceText(), "了解更多",
                 ImageUrls.poster(row.posterSubjectOrFallback()));
     }
 
     private ProductItem toItem(ProductRow row) {
-        return new ProductItem(row.name(), row.subtitle(), row.priceText(), row.tag(), ImageUrls.photo(row.imageSubject()));
+        return new ProductItem(row.id(), row.name(), row.subtitle(), row.priceText(), row.tag(),
+                ImageUrls.photo(row.imageSubject()));
     }
 }
