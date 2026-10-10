@@ -29,6 +29,8 @@
     <java.version>25</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <xiaomi-backend.version>1.0.0</xiaomi-backend.version>
+    <!-- MyBatis 官方 starter 的 4.x 线对应 Spring Boot 4（内部依赖 mybatis 3.5.19 + mybatis-spring 4.1.0） -->
+    <mybatis-spring-boot.version>4.1.0</mybatis-spring-boot.version>
   </properties>
 
   <dependencyManagement>
@@ -43,6 +45,12 @@
         <groupId>com.xiaomi</groupId>
         <artifactId>xiaomi-product-api</artifactId>
         <version>${xiaomi-backend.version}</version>
+      </dependency>
+      <!-- 第三方 starter 版本统一在此锁定（Spring Boot 父 pom 未收录 MyBatis） -->
+      <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+        <version>${mybatis-spring-boot.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

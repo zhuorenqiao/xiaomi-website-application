@@ -1,0 +1,325 @@
+/* 商品搜索 / 分类浏览列表页（参考 mi.com/shop/search）：命中数、筛选排序条、商品网格、分页 */
+.search {
+  padding: 18px 0 44px;
+  background: var(--bg);
+}
+
+.search__inner {
+  display: block;
+}
+
+/* ---------- 面包屑 ---------- */
+.search__crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+
+  a {
+    color: var(--text-2);
+    transition: color 0.2s var(--ease);
+
+    &:hover {
+      color: var(--mi-orange);
+    }
+  }
+}
+
+/* ---------- 标题 + 命中数 ---------- */
+.search__head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 6px 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search__head-title {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.search__head-sub {
+  margin-left: 10px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--mi-orange);
+  background: #fff3ea;
+  vertical-align: 2px;
+}
+
+.search__head-count {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-2);
+
+  em {
+    padding: 0 3px;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--mi-orange);
+  }
+}
+
+/* ---------- 筛选 / 排序条 ---------- */
+.search__filters {
+  margin-top: 6px;
+}
+
+.search__filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 9px 0;
+}
+
+.search__filter-label {
+  flex: none;
+  width: 34px;
+  font-size: 13px;
+  line-height: 28px;
+  color: var(--text-3);
+}
+
+.search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search__chip,
+.search__chip-active {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--line);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+
+  i {
+    margin-left: 6px;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  &:hover {
+    color: var(--mi-orange);
+    border-color: var(--mi-orange);
+  }
+}
+
+.search__chip-active {
+  font-weight: 600;
+  color: var(--mi-orange);
+  background: #fff7f2;
+  border-color: var(--mi-orange);
+
+  i {
+    color: var(--mi-orange);
+  }
+}
+
+.search__sorts {
+  display: flex;
+  gap: 8px;
+}
+
+.search__sort,
+.search__sort-active {
+  height: 28px;
+  padding: 0 16px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg-gray);
+  border: 1px solid transparent;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease);
+
+  &:hover {
+    color: var(--mi-orange);
+  }
+}
+
+.search__sort-active {
+  color: var(--mi-orange);
+  background: #fff;
+  border-color: var(--mi-orange);
+}
+
+.search__sort-arrow {
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* ---------- 商品网格 ---------- */
+.search__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+  min-height: 220px;
+}
+
+/* 翻页时保留旧结果并压暗，避免出现「整块闪空」 */
+.search__grid--loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.search__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 26px 16px 20px;
+  text-align: center;
+  background: #fff;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+
+  &:hover {
+    z-index: 1;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.search__card-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 2px 9px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #fff;
+  background: var(--mi-orange);
+}
+
+.search__card-media {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 18px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.search__card-name {
+  max-width: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search__card-desc {
+  max-width: 100%;
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search__card-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 9px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.search__card-price {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--mi-orange);
+}
+
+/* ---------- 空态 / 异常态 ---------- */
+.search__empty {
+  grid-column: 1 / -1;
+  padding: 60px 0;
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.search__empty-tip,
+.search__state-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.search__state {
+  padding: 56px 0;
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.search__state-btn {
+  height: 34px;
+  margin-top: 16px;
+  padding: 0 22px;
+  font-size: 13px;
+  color: var(--mi-orange);
+  background: #fff;
+  border: 1px solid var(--mi-orange);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+
+  &:hover {
+    color: #fff;
+    background: var(--mi-orange);
+  }
+}
+
+/* ---------- 分页 ---------- */
+.search__pager {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1080px) {
+  .search__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .search__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .search__head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .search__head-count {
+    margin-left: 0;
+  }
+
+  .search__card {
+    padding: 18px 12px 16px;
+  }
+
+  .search__card-media {
+    height: 120px;
+    margin-bottom: 14px;
+  }
+}

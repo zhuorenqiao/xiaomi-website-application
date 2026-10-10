@@ -5,6 +5,35 @@ spring:
   application:
     name: xiaomi-product-server
 
+  # ---------- 商品库（MySQL 8.4，本地由 back/db/docker-compose.yml 拉起） ----------
+  datasource:
+    # 三项均可用同名环境变量覆盖（生产/联调用），默认值仅为本地开发容器账号
+    url: ${PRODUCT_DB_URL:jdbc:mysql://127.0.0.1:3306/xiaomi_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${PRODUCT_DB_USERNAME:xiaomi}
+    password: ${PRODUCT_DB_PASSWORD:xiaomi_dev}
+    hikari:
+      pool-name: product-pool
+      maximum-pool-size: 10
+      connection-timeout: 5000
+
+  # 建表与种子数据脚本（幂等：CREATE IF NOT EXISTS + INSERT IGNORE），每次启动校对一次
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+
+# MyBatis：SQL 集中在 resources/mapper/*.xml，接口在 com.xiaomi.product.mapper（@Mapper 自动扫描）
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    # 列名下划线 -> Java 字段驼峰（feature_subtitle -> featureSubtitle）
+    map-underscore-to-camel-case: true
+    # 结果类型是无无参构造的 record（ProductRow / SearchFacet）时，按构造器参数名自动映射；
+    # 依赖编译期 -parameters（spring-boot-starter-parent 默认开启），否则启动后查询会报找不到构造器
+    arg-name-based-constructor-auto-mapping: true
+
 # 商品服务配置
 product:
   cors:
@@ -12,3 +41,6 @@ product:
     allowed-origins:
       - http://localhost:5173
       - http://127.0.0.1:5173
+  homepage:
+    # 首页每个栏目网格最多展示的商品数（主推位不占用该配额）
+    max-grid-products: 8

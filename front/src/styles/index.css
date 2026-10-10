@@ -86,3 +86,11 @@ input[type='search']::-webkit-search-cancel-button {
   width: min(1226px, 100% - 28px);
   margin-inline: auto;
 }
+
+/* 懒加载视图（如商品列表页）的代码块到达前的占位提示 */
+.page-loading {
+  padding: 40px 0;
+  font-size: 14px;
+  color: var(--text-2);
+  text-align: center;
+}

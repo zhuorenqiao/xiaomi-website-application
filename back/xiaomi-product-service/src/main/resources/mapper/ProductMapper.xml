@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  商品库 SQL（MySQL）：首页栏目取数 + 关键词搜索（分类筛选 / 排序 / 分页）。
+
+  安全与映射约定：
+  1. 所有用户输入一律 #{} 预编译占位符，不做字符串拼接；
+  2. ORDER BY 通过 <choose> 从固定分支里挑选，sort 参数本身不会进入 SQL 文本；
+  3. LIKE 模式（含转义与百分号）由 Java 侧 ProductRepository.likePattern 生成后作为参数传入；
+  4. 结果集用自动映射到 record：列名（下划线）-> 构造器参数名（驼峰），
+     依赖 application.yml 里的 map-underscore-to-camel-case 与 arg-name-based-constructor-auto-mapping，
+     因此查询列必须与 ProductRow / SearchFacet 的字段名一一对应。
+-->
+<mapper namespace="com.xiaomi.product.mapper.ProductMapper">
+
+  <sql id="productColumns">
+    SELECT p.id, p.name, p.subtitle, p.feature_subtitle, p.brand, p.price, p.tag,
+           p.category_code, c.name AS category_name, p.image_subject, p.poster_subject,
+           p.is_feature, p.sales, p.list_order
+      FROM product p
+      JOIN product_category c ON c.code = p.category_code
+  </sql>
+
+  <!-- 关键词条件：商品名 / 卖点 / 品牌 / 所属分类名任一命中（pattern 为 null 时不生成条件） -->
+  <sql id="keywordCondition">
+    <if test="pattern != null">
+      AND (p.name LIKE #{pattern} OR p.subtitle LIKE #{pattern}
+           OR p.brand LIKE #{pattern} OR c.name LIKE #{pattern})
+    </if>
+  </sql>
+
+  <!-- 搜索条件：关键词 + 分类 -->
+  <sql id="criteriaWhere">
+    <where>
+      <include refid="keywordCondition"/>
+      <if test="category != null and category != ''">
+        AND p.category_code = #{category}
+      </if>
+    </where>
+  </sql>
+
+  <!-- 排序：编码 -> 固定 ORDER BY 分支（与 ProductSort 枚举一一对应） -->
+  <sql id="orderBy">
+    <choose>
+      <when test="sort == 'sales'">ORDER BY p.sales DESC, p.id ASC</when>
+      <when test="sort == 'price_asc'">ORDER BY p.price ASC, p.id ASC</when>
+      <when test="sort == 'price_desc'">ORDER BY p.price DESC, p.id ASC</when>
+      <otherwise>ORDER BY p.is_feature DESC, p.list_order ASC, p.id ASC</otherwise>
+    </choose>
+  </sql>
+
+  <!-- 首页栏目：全量取回后在 Java 侧按分类分组（主推位 + 网格前 N 个） -->
+  <select id="selectAllOrdered" resultType="com.xiaomi.product.catalog.ProductRow">
+    <include refid="productColumns"/>
+    ORDER BY c.list_order ASC, p.list_order ASC, p.id ASC
+  </select>
+
+  <select id="countByCriteria" resultType="long">
+    SELECT COUNT(*)
+      FROM product p
+      JOIN product_category c ON c.code = p.category_code
+    <include refid="criteriaWhere"/>
+  </select>
+
+  <select id="selectPage" resultType="com.xiaomi.product.catalog.ProductRow">
+    <include refid="productColumns"/>
+    <include refid="criteriaWhere"/>
+    <include refid="orderBy"/>
+    LIMIT #{limit} OFFSET #{offset}
+  </select>
+
+  <!-- 分类筛选条：只受关键词影响，便于展示「还能怎么缩小范围」 -->
+  <select id="selectFacets" resultType="com.xiaomi.product.api.SearchFacet">
+    SELECT c.code AS code, c.name AS name, COUNT(*) AS count
+      FROM product p
+      JOIN product_category c ON c.code = p.category_code
+    <where>
+      <include refid="keywordCondition"/>
+    </where>
+    GROUP BY c.code, c.name, c.list_order
+    ORDER BY c.list_order ASC
+  </select>
+
+</mapper>

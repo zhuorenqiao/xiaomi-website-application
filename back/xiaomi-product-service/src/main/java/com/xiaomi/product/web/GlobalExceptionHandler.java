@@ -1,6 +1,6 @@
 package com.xiaomi.product.web;
 
-import java.util.Map;
+import com.xiaomi.product.api.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -20,21 +20,19 @@ public class GlobalExceptionHandler {
 
     /** 未映射路径 / 静态资源不存在：单独返回 404，避免被下方兜底分支误报成服务端错误 */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(NoResourceFoundException e) {
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(NoResourceFoundException e) {
         log.debug("no resource for {} {}", e.getHttpMethod(), e.getResourcePath());
         return error(HttpStatus.NOT_FOUND, "接口不存在");
     }
 
     /** 兜底：未预期异常 */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleUnexpected(Exception e) {
+    public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception e) {
         log.error("unexpected error", e);
         return error(HttpStatus.INTERNAL_SERVER_ERROR, "服务内部错误");
     }
 
-    private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {
-        return ResponseEntity.status(status).body(Map.of(
-                "success", false,
-                "message", message));
+    private ResponseEntity<ApiResponse<Void>> error(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(ApiResponse.error(message));
     }
 }

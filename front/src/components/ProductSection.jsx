@@ -1,14 +1,25 @@
 import { IconArrowRight } from './Icons.jsx'
 import styles from './ProductSection.module.less'
 
-export default function ProductSection({ section }) {
+/**
+ * 首页商品栏目（无状态展示组件）。
+ * @param {{ id: string, title: string, feature: object, products: Array[] }} section 栏目数据
+ * @param {(section: object) => void} [onViewAll] 「查看全部」回调：进入该分类的商品列表页（分页）
+ */
+export default function ProductSection({ section, onViewAll }) {
   const { id, title, feature, products } = section
+
+  const handleViewAll = (event) => {
+    if (!onViewAll) return
+    event.preventDefault()
+    onViewAll(section)
+  }
 
   return (
     <section className={`${styles.psection} container`} id={id}>
       <div className={styles.psectionHead}>
         <h2>{title}</h2>
-        <a className={styles.psectionMore} href="#top">
+        <a className={styles.psectionMore} href="#top" onClick={handleViewAll}>
           查看全部 <IconArrowRight width={15} height={15} />
         </a>
       </div>

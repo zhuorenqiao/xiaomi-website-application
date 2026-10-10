@@ -1,0 +1,46 @@
+# ============================================================
+# 本地开发用商品库：MySQL 8.4（镜像本机已存在，无需联网拉取）
+# ------------------------------------------------------------
+# 用法（在 back/ 目录执行）：
+#   docker compose -f db/docker-compose.yml up -d
+#   docker compose -f db/docker-compose.yml logs -f      # 看初始化日志
+#   docker compose -f db/docker-compose.yml down         # 停止（数据卷保留）
+#
+# 这里只负责【创建数据库实例与空库 xiaomi_product】；
+# 建表与种子数据由 xiaomi-product-service 启动时执行
+# src/main/resources/db/schema.sql、data.sql（单一数据源定义，避免两处维护）。
+#
+# 账号密码为本地开发专用，已通过 back/.gitignore 之外的方式公开；
+# 生产环境请通过 SPRING_DATASOURCE_* 环境变量覆盖后端配置。
+# ============================================================
+name: xiaomi-product-db
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: xiaomi-product-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: xiaomi-root
+      MYSQL_DATABASE: xiaomi_product
+      MYSQL_USER: xiaomi
+      MYSQL_PASSWORD: xiaomi_dev
+      TZ: Asia/Shanghai
+    # utf8mb4 保证中文商品名/卖点可正常存储；关闭 X 协议避免占用 33060
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --mysqlx=0
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 25s
+    volumes:
+      - xiaomi_product_mysql:/var/lib/mysql
+
+volumes:
+  xiaomi_product_mysql:

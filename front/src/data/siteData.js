@@ -30,7 +30,7 @@ export const topBarRight = [
 export const navLinks = [
   { label: 'Xiaomi手机', href: '#phone' },
   { label: 'REDMI手机', href: '#phone' },
-  { label: '电视', href: '#appliance' },
+  { label: '电视', href: '#tv' },
   { label: '笔记本', href: '#laptop' },
   { label: '平板', href: '#laptop' },
   { label: '家电', href: '#appliance' },
@@ -39,7 +39,7 @@ export const navLinks = [
   { label: '社区', href: '#top' },
 ]
 
-export const searchPlaceholder = '电池'
+export const searchPlaceholder = '电视'
 
 /* ---------- 轮播 Banner ---------- */
 export const slides = [
@@ -106,8 +106,9 @@ export const promoBanner = {
   ),
 }
 
-/* ---------- 产品栏目（商品列表）已迁移至后端商品微服务 xiaomi-product-service：
-   前端通过 src/hooks/useProducts.js 调用 GET /api/products/sections 获取，见 App.jsx ---------- */
+/* ---------- 产品栏目（商品列表）已迁移至后端商品微服务 xiaomi-product-service（MySQL 商品库）：
+   首页栏目 GET /api/products/sections（useProducts.js）
+   搜索分页 GET /api/products/search（useProductSearch.js，见 SearchPage.jsx） ---------- */
 
 /* ---------- 页脚 ---------- */
 export const serviceItems = [
