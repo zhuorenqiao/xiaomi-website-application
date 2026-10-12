@@ -180,7 +180,9 @@
   line-height: 1;
   color: var(--text-2);
   background: var(--bg-gray);
-  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+  /* 这几个按钮只在写操作 in-flight 时被 disabled，几十毫秒的瞬时置灰看着就是闪动；
+     opacity 加 0.2s 延迟：请求快就完全不动，真的慢了才给出禁用反馈 */
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), opacity 0.2s var(--ease) 0.2s;
 
   &:hover:not(:disabled) {
     color: var(--mi-orange);
@@ -209,7 +211,7 @@
 .remove-btn {
   font-size: 13px;
   color: var(--text-3);
-  transition: color 0.2s var(--ease);
+  transition: color 0.2s var(--ease), opacity 0.2s var(--ease) 0.2s;
 
   &:hover:not(:disabled) {
     color: var(--mi-orange);
@@ -234,7 +236,7 @@
 .clear-btn {
   font-size: 13px;
   color: var(--text-2);
-  transition: color 0.2s var(--ease);
+  transition: color 0.2s var(--ease), opacity 0.2s var(--ease) 0.2s;
 
   &:hover:not(:disabled) {
     color: var(--mi-orange);
@@ -269,7 +271,7 @@
   color: #fff;
   background: var(--mi-orange);
   border: 1px solid var(--mi-orange);
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease), opacity 0.2s var(--ease) 0.2s;
 
   &:hover:not(:disabled) {
     background: var(--mi-orange-dark);
@@ -280,13 +282,6 @@
     cursor: not-allowed;
     opacity: 0.7;
   }
-}
-
-.notice {
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--mi-orange);
-  text-align: right;
 }
 
 /* ---------- 空态 / 异常态 ---------- */

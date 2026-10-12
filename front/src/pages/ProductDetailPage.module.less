@@ -134,6 +134,9 @@
   display: flex;
   gap: 10px;
   margin-top: 12px;
+  /* 缩略图张数随 SKU 颜色 + 多视角变化，常宽于画廊列：横向滚动，别撑破页面 */
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .thumb,
@@ -308,12 +311,16 @@
   padding: 0 34px;
   font-size: 15px;
   border: 1px solid var(--mi-orange);
-  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease),
+    border-color 0.2s var(--ease);
 }
 
 .cart-btn {
   color: var(--mi-orange);
   background: #fff;
+  /* 撑住「加入购物车」文案的宽度：切成「处理中…」时不推动右边的立即购买
+     （5 个字 + 左右 padding 34px + 1px 边框，border-box） */
+  min-width: calc(5em + 68px + 2px);
 
   &:hover {
     color: #fff;
@@ -329,12 +336,6 @@
     background: var(--mi-orange-dark);
     border-color: var(--mi-orange-dark);
   }
-}
-
-.notice {
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--mi-orange);
 }
 
 .services {
@@ -448,6 +449,10 @@
   background: var(--text-3);
   border-color: var(--text-3);
   cursor: not-allowed;
+  /* 加购写操作只有几十毫秒，两个按钮会跟着瞬间变灰再变回来（看着就是闪动）；
+     上色延迟 0.2s，真的无货 / 无 SKU 时才会置灰 */
+  transition: color 0.2s var(--ease) 0.2s, background 0.2s var(--ease) 0.2s,
+    border-color 0.2s var(--ease) 0.2s;
 }
 
 .cart-btn:disabled {
@@ -674,10 +679,6 @@
     margin-inline: auto;
   }
 
-  .thumbs {
-    justify-content: center;
-  }
-
   .ctas {
     flex-wrap: wrap;
   }
@@ -686,6 +687,8 @@
   .buy-btn {
     flex: 1 1 45%;
     padding: 0 12px;
+    /* 窄屏按行宽等分，别用桌面那套 min-width 把两个按钮撑出容器 */
+    min-width: 0;
   }
 
   .specs th {

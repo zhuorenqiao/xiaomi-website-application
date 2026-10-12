@@ -162,12 +162,15 @@
   gap: 14px;
   margin-top: 18px;
   min-height: 220px;
+  transition: opacity 0.2s var(--ease);
 }
 
 /* 翻页时保留旧结果并压暗，避免出现「整块闪空」 */
 .search__grid--loading {
   opacity: 0.55;
   pointer-events: none;
+  /* 压暗同样延迟 0.2s：本地/快网络下整块列表半透明一闪，看着就是闪动 */
+  transition: opacity 0.2s var(--ease) 0.2s;
 }
 
 .search__card {

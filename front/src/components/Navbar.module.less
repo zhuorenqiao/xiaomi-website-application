@@ -176,6 +176,11 @@
     display: none;
   }
 
+  /* 左侧分组隐藏后 space-between 只剩一个子项，会把右侧链接推到最左边 */
+  .topbar__links:last-child {
+    margin-left: auto;
+  }
+
   .navbar {
     gap: 20px;
   }
@@ -184,8 +189,14 @@
     display: none;
   }
 
-  .navbar__search input {
-    width: 180px;
+  /* 主导航一隐藏就该由搜索框吃掉剩余宽度，否则 901~1200px 这段右侧会空出一大截 */
+  .navbar__search {
+    flex: 1;
+    min-width: 0;
+
+    input {
+      width: 100%;
+    }
   }
 }
 
@@ -199,13 +210,7 @@
   }
 
   .navbar__search {
-    flex: 1;
-
-    input {
-      width: 100%;
-      height: 42px;
-    }
-
+    input,
     button {
       height: 42px;
     }

@@ -1,0 +1,48 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { searchProducts } from '../api/products'
+import type { LoadStatus } from '../types/api'
+import type { ProductQuery, ProductSearchResult } from '../types/product'
+import { isAbortError, toError } from '../utils/error'
+
+/**
+ * 商品搜索分页 Hook：查询条件（关键词 / 分类 / 排序 / 页码 / 每页条数）任一变化即重新请求，
+ * 并保证在途请求被取消，避免快速翻页时旧响应覆盖新结果。
+ *
+ * 保留上一次结果（result）用于翻页时的骨架过渡，翻页过程不会出现「整块内容闪空」。
+ * 返回 result / status / error / retry。
+ */
+export default function useProductSearch(query: ProductQuery) {
+  const { keyword = '', category = '', sort = 'default', page = 1, size = 20 } = query
+  const [result, setResult] = useState<ProductSearchResult | null>(null)
+  const [status, setStatus] = useState<LoadStatus>('loading')
+  const [error, setError] = useState<Error | null>(null)
+  const [nonce, setNonce] = useState(0)
+  const controllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    // 重新加载时取消上一次在途请求（StrictMode 双挂载 / 快速翻页都会走到这里）
+    controllerRef.current?.abort()
+    const controller = new AbortController()
+    controllerRef.current = controller
+
+    setStatus('loading')
+    setError(null)
+    searchProducts({ keyword, category, sort, page, size }, controller.signal)
+      .then((data) => {
+        if (controller.signal.aborted) return
+        setResult(data)
+        setStatus('ready')
+      })
+      .catch((err) => {
+        if (isAbortError(err) || controller.signal.aborted) return
+        setError(toError(err))
+        setStatus('error')
+      })
+  }, [keyword, category, sort, page, size, nonce])
+
+  useEffect(() => () => controllerRef.current?.abort(), [])
+
+  const retry = useCallback(() => setNonce((value) => value + 1), [])
+
+  return { result, status, error, retry }
+}
