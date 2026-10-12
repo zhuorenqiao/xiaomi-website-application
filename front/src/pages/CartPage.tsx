@@ -58,7 +58,14 @@ export default function CartPage() {
 
   const handleClear = () => {
     if (pending || items.length === 0) return
-    clear().catch((e) => showToast(`清空失败：${errorMessage(e)}`))
+    modal.confirm({
+      title: '清空购物车',
+      content: `确定移除全部 ${count} 件商品吗？`,
+      okText: '清空',
+      okButtonProps: { danger: true },
+      cancelText: '取消',
+      onOk: () => clear().catch((e) => showToast(`清空失败：${errorMessage(e)}`)),
+    })
   }
 
   const handleCheckout = () => {

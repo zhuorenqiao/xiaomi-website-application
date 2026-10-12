@@ -130,13 +130,67 @@
   background: var(--mi-orange);
 }
 
+/* 缩略图条：占满整行，一排放不下时叠一对翻页箭头，hover / 键盘聚焦才滑出来
+   （滚动容器保留，滚动条隐藏） */
+.thumbs-row {
+  position: relative;
+  margin-top: 12px;
+}
+
 .thumbs {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
-  /* 缩略图张数随 SKU 颜色 + 多视角变化，常宽于画廊列：横向滚动，别撑破页面 */
   overflow-x: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.thumbs-arrow {
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease),
+    color 0.2s var(--ease), border-color 0.2s var(--ease);
+
+  &:hover:not(:disabled) {
+    color: var(--mi-orange);
+    border-color: var(--mi-orange);
+  }
+
+  &:disabled {
+    color: var(--text-3);
+    cursor: not-allowed;
+  }
+}
+
+/* translateY 负责垂直居中，translateX 负责滑入，两者写在同一个 transform 里 */
+.thumbs-arrow--prev {
+  left: 0;
+  transform: translateY(-50%) translateX(-6px);
+}
+
+.thumbs-arrow--next {
+  right: 0;
+  transform: translateY(-50%) translateX(6px);
+}
+
+.thumbs-row:hover .thumbs-arrow,
+.thumbs-arrow:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) translateX(0);
 }
 
 .thumb,

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { IconArrowRight } from '../components/Icons'
+import { IconArrowRight, IconChevronLeft, IconChevronRight } from '../components/Icons'
 import Toast from '../components/Toast'
 import useAppNav from '../hooks/useAppNav'
 import useCart from '../hooks/useCart'
@@ -95,6 +95,42 @@ export default function ProductDetailPage() {
 
   // 画廊视图：选中 SKU 的颜色图排到首位（切颜色即换主图），其后是商品多视角
   const skuViews = selectedSku?.image ? [selectedSku.image, ...gallery] : gallery
+
+  // 缩略图条：一排放不下时改用左右箭头翻页。箭头只在真的溢出时出现——出现后容器更窄、
+  // 只会更溢出，不会出现「出现/消失」来回抖动；到边的箭头只是禁用，不影响布局。
+  const thumbsRef = useRef<HTMLDivElement>(null)
+  const [thumbsPaging, setThumbsPaging] = useState({ overflowing: false, canPrev: false, canNext: false })
+
+  const measureThumbs = useCallback(() => {
+    const box = thumbsRef.current
+    if (!box) return
+    const max = box.scrollWidth - box.clientWidth
+    setThumbsPaging({
+      overflowing: max > 1,
+      canPrev: box.scrollLeft > 1,
+      canNext: box.scrollLeft < max - 1,
+    })
+  }, [])
+
+  const pageThumbs = (dir: 1 | -1) => {
+    const box = thumbsRef.current
+    if (!box) return
+    // 留一张缩略图做视觉衔接，翻页后能看出没翻到同一批
+    box.scrollBy({ left: dir * Math.max(box.clientWidth - 74, 64), behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    measureThumbs()
+    window.addEventListener('resize', measureThumbs)
+    return () => window.removeEventListener('resize', measureThumbs)
+  }, [measureThumbs, skuViews.length])
+
+  // 换颜色后 activeImage 复位到 0，把当前选中的缩略图滚回可视范围
+  useEffect(() => {
+    const box = thumbsRef.current
+    const thumb = box?.children[activeImage]
+    thumb?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' })
+  }, [activeImage, skuViews.length])
 
   // 切换商品（点推荐进新详情）时复位局部交互态，避免沿用上一个商品的选择
   useEffect(() => {
@@ -208,18 +244,42 @@ export default function ProductDetailPage() {
               <img src={mainImage} alt={detail.name} />
             </div>
             {skuViews.length > 1 ? (
-              <div className={styles.thumbs}>
-                {skuViews.map((src, index) => (
+              <div className={styles.thumbsRow}>
+                {thumbsPaging.overflowing ? (
                   <button
                     type="button"
-                    key={`${src}-${index}`}
-                    className={index === activeImage ? styles.thumbActive : styles.thumb}
-                    onClick={() => setActiveImage(index)}
-                    aria-label={`查看第 ${index + 1} 张图`}
+                    className={`${styles.thumbsArrow} ${styles.thumbsArrowPrev}`}
+                    onClick={() => pageThumbs(-1)}
+                    disabled={!thumbsPaging.canPrev}
+                    aria-label="上一批图片"
                   >
-                    <img src={src} alt="" loading="lazy" />
+                    <IconChevronLeft width={14} height={14} />
                   </button>
-                ))}
+                ) : null}
+                <div className={styles.thumbs} ref={thumbsRef} onScroll={measureThumbs}>
+                  {skuViews.map((src, index) => (
+                    <button
+                      type="button"
+                      key={`${src}-${index}`}
+                      className={index === activeImage ? styles.thumbActive : styles.thumb}
+                      onClick={() => setActiveImage(index)}
+                      aria-label={`查看第 ${index + 1} 张图`}
+                    >
+                      <img src={src} alt="" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+                {thumbsPaging.overflowing ? (
+                  <button
+                    type="button"
+                    className={`${styles.thumbsArrow} ${styles.thumbsArrowNext}`}
+                    onClick={() => pageThumbs(1)}
+                    disabled={!thumbsPaging.canNext}
+                    aria-label="下一批图片"
+                  >
+                    <IconChevronRight width={14} height={14} />
+                  </button>
+                ) : null}
               </div>
             ) : null}
           </div>
