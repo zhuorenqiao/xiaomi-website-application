@@ -34,6 +34,14 @@ export function IconCart({ width = 16, height = 16 }: IconProps) {
   )
 }
 
+export function IconClose({ width = 12, height = 12 }: IconProps) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" {...base}>
+      <path d="M5 5l14 14M19 5 5 19" />
+    </svg>
+  )
+}
+
 export function IconChevronRight({ width = 14, height = 14 }: IconProps) {
   return (
     <svg width={width} height={height} viewBox="0 0 24 24" {...base}>

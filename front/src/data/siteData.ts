@@ -35,16 +35,24 @@ export const topBarRight = [
 ]
 
 /* ---------- 主导航 ---------- */
-export const navLinks = [
-  { label: 'Xiaomi手机', href: '#phone' },
-  { label: 'REDMI手机', href: '#phone' },
-  { label: '电视', href: '#tv' },
-  { label: '笔记本', href: '#laptop' },
-  { label: '平板', href: '#laptop' },
-  { label: '家电', href: '#appliance' },
-  { label: '路由器', href: '#smarthome' },
-  { label: '服务中心', href: '#service' },
-  { label: '社区', href: '#top' },
+export interface NavLink {
+  label: string
+  /** 对应的后端分类编码，用于 hover 浮层拉取商品 */
+  category?: string
+  /** 是否展示 hover 浮层子菜单（服务中心、社区不展示） */
+  hasDropdown: boolean
+}
+
+export const navLinks: NavLink[] = [
+  { label: 'Xiaomi手机', category: 'phone', hasDropdown: true },
+  { label: 'REDMI手机', category: 'phone', hasDropdown: true },
+  { label: '电视', category: 'tv', hasDropdown: true },
+  { label: '笔记本', category: 'laptop', hasDropdown: true },
+  { label: '平板', category: 'laptop', hasDropdown: true },
+  { label: '家电', category: 'appliance', hasDropdown: true },
+  { label: '路由器', category: 'smarthome', hasDropdown: true },
+  { label: '服务中心', hasDropdown: false },
+  { label: '社区', hasDropdown: false },
 ]
 
 export const searchPlaceholder = '电视'

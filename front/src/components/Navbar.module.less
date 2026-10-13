@@ -4,6 +4,8 @@
   height: 40px;
   font-size: 12px;
   color: var(--text-3);
+  position: relative;
+  overflow: visible;
 }
 
 .topbar__inner {
@@ -47,6 +49,184 @@
   }
 }
 
+/* ---------- 顶部购物车 hover 浮层 ---------- */
+.topbar__cart-wrap {
+  position: relative;
+}
+
+.topbar__cart {
+  color: var(--mi-orange) !important;
+
+  &:hover {
+    color: var(--mi-orange) !important;
+  }
+}
+
+/* 浮层展开时入口底色变纯白，与下拉面板连成一体（同 mi.com 顶部购物车） */
+.topbar__cart--open {
+  background: #fff;
+  /* 铺满工具条整高，白底一直延伸到浮层顶部，中间不留暗色细线 */
+  height: 100%;
+}
+
+@keyframes cart-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.topbar__cart-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 200;
+  width: 380px;
+  background: #fff;
+  /* 四边边框全部去掉，只靠投影区分浮层与页面内容 */
+  border: none;
+  /* 纵向偏移 >= 模糊半径，阴影不再往上溢到入口白底上，两个模块视觉上融为一体 */
+  box-shadow: 0 24px 24px rgba(0, 0, 0, 0.12);
+  animation: cart-slide-down 0.25s ease-out both;
+}
+
+.topbar__cart-list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.topbar__cart-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 10px 10px 16px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--bg-gray);
+  }
+}
+
+/* 可点击主体（图 + 名称规格 + 价格）铺满剩余宽度，移除按钮贴右 */
+.topbar__cart-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar__cart-item-media {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.topbar__cart-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar__cart-item-name {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar__cart-item-spec {
+  font-size: 12px;
+  color: var(--text-3);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar__cart-item-price {
+  flex: none;
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.topbar__cart-item-remove {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 8px;
+  padding: 0;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s var(--ease);
+
+  &:hover {
+    color: var(--mi-orange);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.topbar__cart-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.topbar__cart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  span {
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  strong {
+    font-size: 20px;
+    color: var(--mi-orange);
+    font-weight: 600;
+  }
+}
+
+.topbar__cart-btn {
+  padding: 8px 20px;
+  background: var(--mi-orange);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #e85d00;
+  }
+}
+
 /* ---------- 主导航 ---------- */
 .navbar {
   display: flex;
@@ -54,6 +234,7 @@
   gap: 32px;
   height: 100px;
   background: #fff;
+  position: relative;
 }
 
 .navbar__logo {
@@ -83,6 +264,96 @@
       color: var(--mi-orange);
     }
   }
+}
+
+/* 当前 hover 的菜单项高亮 */
+.navbar__menu-item--active {
+  color: var(--mi-orange) !important;
+}
+
+/* ---------- 浮层子菜单 ---------- */
+@keyframes dropdown-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  z-index: 100;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  animation: dropdown-slide-down 0.25s ease-out both;
+}
+
+.navbar__dropdown-inner {
+  display: flex;
+  gap: 24px;
+  padding: 32px 0;
+  justify-content: center;
+}
+
+.navbar__dropdown-loading {
+  font-size: 14px;
+  color: var(--text-3);
+  padding: 40px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.navbar__dropdown-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 160px;
+  text-align: center;
+  transition: transform 0.2s var(--ease);
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+.navbar__dropdown-media {
+  width: 140px;
+  height: 140px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.navbar__dropdown-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.4;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.navbar__dropdown-price {
+  font-size: 14px;
+  color: var(--mi-orange);
+  margin: 0;
 }
 
 /* ---------- 搜索框 ---------- */

@@ -661,6 +661,8 @@
   text-align: center;
   background: #fff;
   border: 1px solid var(--line);
+  /* 把推进来的加购按钮裁在卡片内，不露到下一行商品上 */
+  overflow: hidden;
   transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
 
   &:hover {
@@ -669,6 +671,49 @@
     transform: translateY(-3px);
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
   }
+}
+
+/* 卡片主体链接（图 + 名称 + 卖点 + 价格），整块可点进详情 */
+.related-card-link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  color: inherit;
+}
+
+/* hover 时从卡片底部推进来，落点正好盖住价格行（同 mi.com 推荐位） */
+.related-add {
+  position: absolute;
+  right: 16px;
+  bottom: 13px;
+  left: 16px;
+  height: 32px;
+  font-size: 13px;
+  color: var(--mi-orange);
+  background: #fff;
+  border: 1px solid var(--mi-orange);
+  cursor: pointer;
+  transform: translateY(calc(100% + 14px));
+  transition: transform 0.25s var(--ease), background 0.2s var(--ease), color 0.2s var(--ease);
+
+  &:hover {
+    color: #fff;
+    background: var(--mi-orange);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+}
+
+/* 键盘 Tab 到按钮时同样推出，不依赖鼠标 hover */
+.related-card:hover .related-add,
+.related-card:focus-within .related-add {
+  transform: translateY(0);
 }
 
 .related-media {
@@ -756,6 +801,13 @@
 
   .related-card {
     padding: 18px 12px 16px;
+  }
+
+  /* 窄屏卡片内边距收窄，按钮跟着贴边，保证仍盖住价格行 */
+  .related-add {
+    right: 12px;
+    bottom: 10px;
+    left: 12px;
   }
 
   .related-media {

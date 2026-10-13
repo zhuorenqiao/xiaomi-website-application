@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { fetchProductDetail } from '../api/products'
+import type { SearchProductItem } from '../types/product'
 import { IconArrowRight, IconChevronLeft, IconChevronRight } from '../components/Icons'
 import Toast from '../components/Toast'
 import useAppNav from '../hooks/useAppNav'
@@ -65,6 +67,8 @@ export default function ProductDetailPage() {
   const { message: toast, showToast, dismiss: dismissToast } = useToast()
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
+  // 推荐位正在加购的商品 id：同时只允许一行在写，用于按钮文案与防重复提交
+  const [addingRelated, setAddingRelated] = useState<number | null>(null)
 
   const gallery = detail?.gallery ?? []
   const skus = detail?.skus ?? []
@@ -140,6 +144,7 @@ export default function ProductDetailPage() {
     dismissToast()
     setSelectedVersion(null)
     setSelectedColor(null)
+    setAddingRelated(null)
   }, [id, dismissToast])
 
   // 详情页独立标题，离开时还原，避免污染其它页面标题
@@ -179,6 +184,29 @@ export default function ProductDetailPage() {
       goCart()
     } catch (e) {
       showToast(`加入购物车失败：${errorMessage(e)}`)
+    }
+  }
+
+  /**
+   * 推荐位 hover 按钮直接加购：列表项不带 SKU，先拉详情取首个有货规格写入购物车，
+   * 避免为了加一件商品把用户整页跳走。
+   */
+  const handleRelatedAdd = async (item: SearchProductItem) => {
+    if (addingRelated != null || cart.pending) return
+    setAddingRelated(item.id)
+    try {
+      const full = await fetchProductDetail(item.id)
+      const sku = full.skus.find((s) => Number(s.stock) > 0)
+      if (!sku) {
+        showToast('该商品暂无可购规格')
+        return
+      }
+      await cart.addItem(sku.id, 1)
+      showToast(`已加入购物车：${item.name}`)
+    } catch (e) {
+      showToast(`加入购物车失败：${errorMessage(e)}`)
+    } finally {
+      setAddingRelated(null)
     }
   }
 
@@ -464,22 +492,32 @@ export default function ProductDetailPage() {
             <h2 className={styles.relatedTitle}>购买过的用户还喜欢</h2>
             <div className={styles.relatedGrid}>
               {related.map((item) => (
-                <a
-                  className={styles.relatedCard}
-                  href="#top"
-                  key={item.id}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    goDetail(item.id)
-                  }}
-                >
-                  <div className={styles.relatedMedia}>
-                    <img src={item.image} alt={item.name} loading="lazy" />
-                  </div>
-                  <h3 className={styles.relatedName}>{item.name}</h3>
-                  <p className={styles.relatedDesc}>{item.desc}</p>
-                  <p className={styles.relatedPrice}>{item.price}</p>
-                </a>
+                <div className={styles.relatedCard} key={item.id}>
+                  <a
+                    className={styles.relatedCardLink}
+                    href="#top"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      goDetail(item.id)
+                    }}
+                  >
+                    <div className={styles.relatedMedia}>
+                      <img src={item.image} alt={item.name} loading="lazy" />
+                    </div>
+                    <h3 className={styles.relatedName}>{item.name}</h3>
+                    <p className={styles.relatedDesc}>{item.desc}</p>
+                    <p className={styles.relatedPrice}>{item.price}</p>
+                  </a>
+                  {/* hover / 键盘聚焦时从底部推进来，正好盖住价格行 */}
+                  <button
+                    type="button"
+                    className={styles.relatedAdd}
+                    disabled={addingRelated != null || cart.pending}
+                    onClick={() => handleRelatedAdd(item)}
+                  >
+                    {addingRelated === item.id ? '处理中…' : '加入购物车'}
+                  </button>
+                </div>
               ))}
             </div>
           </section>
