@@ -86,9 +86,13 @@
 }
 
 /* ---------- 搜索框 ---------- */
+/* 搜索按钮宽度：面板要贴着输入框右边缘，两处共用一个值 */
+@search-btn-width: 52px;
+
 .navbar__search {
   display: flex;
   flex: none;
+  position: relative;
 
   input {
     width: 240px;
@@ -114,7 +118,7 @@
   }
 
   button {
-    width: 52px;
+    width: @search-btn-width;
     height: 50px;
     border: 1px solid var(--line);
     background: #fff;
@@ -137,6 +141,56 @@
       border-color: var(--mi-orange);
     }
   }
+}
+
+/* ---------- 搜索联想下拉 ---------- */
+.navbar__suggest {
+  position: absolute;
+  /* 右边收在搜索按钮的左边框处：面板与输入框同宽，看起来是输入框的向下延伸 */
+  top: 100%;
+  left: 0;
+  right: @search-btn-width;
+  z-index: 30;
+  max-height: 344px;
+  /* 不画上边框：输入框的下边框就是分隔线，两条边叠在一起会露出浅色缝 */
+  margin: 0;
+  padding: 6px 0;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--mi-orange);
+  border-top: none;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 下拉打开时把输入框下边框也染成橙色，与面板左右边框接成一圈 */
+.navbar__search input[aria-expanded='true'] {
+  border-bottom-color: var(--mi-orange);
+}
+
+.navbar__suggest-item,
+.navbar__suggest-item--active {
+  padding: 8px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+  cursor: pointer;
+  /* 窄屏下搜索框本身很窄，候选词单行省略，不把面板撑出横向滚动 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar__suggest-item:hover,
+.navbar__suggest-item--active {
+  background: var(--bg-gray);
+  color: var(--mi-orange);
+}
+
+/* 命中片段：只改颜色，不保留 mark 的默认黄底 */
+.navbar__suggest-hit {
+  background: transparent;
+  color: var(--mi-orange);
+  font-weight: 600;
 }
 
 /* ---------- 购物车按钮 ---------- */
@@ -194,8 +248,11 @@
     flex: 1;
     min-width: 0;
 
+    /* 用 flex 撑满剩余宽度，按钮才不会被 100% 宽的输入框挤掉那几像素 */
     input {
-      width: 100%;
+      flex: 1;
+      min-width: 0;
+      width: auto;
     }
   }
 }

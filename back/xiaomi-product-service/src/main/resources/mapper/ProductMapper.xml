@@ -78,6 +78,16 @@
      ORDER BY s.list_order ASC, s.id ASC
   </select>
 
+  <!-- 搜索联想：只按商品名匹配（前端要把命中的片段标橙，命中卖点/品牌会让高亮落空），
+       销量高优先，条数由 Java 侧收敛 -->
+  <select id="selectSuggestions" resultType="string">
+    SELECT p.name
+      FROM product p
+     WHERE p.name LIKE #{pattern}
+     ORDER BY p.sales DESC, p.id ASC
+     LIMIT #{limit}
+  </select>
+
   <select id="countByCriteria" resultType="long">
     SELECT COUNT(*)
       FROM product p

@@ -131,9 +131,15 @@
 
 .search__sort,
 .search__sort-active {
+  /* 固定 28px 高度下必须显式纵向居中：按钮默认按基线排布内容，
+     而箭头 ↑↓ 不在中文字体里、由 fallback 字体绘制，两者基线不一致就会出现「文字偏上、箭头偏下」 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 28px;
   padding: 0 16px;
   font-size: 13px;
+  line-height: 1;
   color: var(--text);
   background: var(--bg-gray);
   border: 1px solid transparent;
@@ -151,8 +157,13 @@
 }
 
 .search__sort-arrow {
+  /* 同样脱离基线对齐，交给 flex 居中；字号略小让箭头像素与文字视觉等重 */
+  display: inline-flex;
+  align-items: center;
   margin-left: 4px;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1;
 }
 
 /* ---------- 商品网格 ---------- */

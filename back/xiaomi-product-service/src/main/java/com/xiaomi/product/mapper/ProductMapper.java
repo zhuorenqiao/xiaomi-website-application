@@ -39,4 +39,7 @@ public interface ProductMapper {
 
     /** 分类筛选项及命中数量：只按关键词统计，不受当前选中分类影响 */
     List<SearchFacet> selectFacets(@Param("pattern") String pattern);
+
+    /** 搜索联想：商品名命中 LIKE 模式的候选词，按销量倒序取前 limit 个 */
+    List<String> selectSuggestions(@Param("pattern") String pattern, @Param("limit") int limit);
 }

@@ -24,6 +24,8 @@ public class ProductService {
 
     /** 同类推荐取数量 */
     private static final int RELATED_LIMIT = 8;
+    /** 搜索联想词下拉最多展示几条 */
+    private static final int SUGGEST_LIMIT = 10;
     /** 画廊多视角：首图沿用列表卡片的正面图（保证点击前后视觉一致），再补 4 个机位 */
     private static final String[] GALLERY_ANGLES = {
             "back view showing the camera module and finish",
@@ -64,6 +66,19 @@ public class ProductService {
                 page > 1, page < totalPages,
                 rows.stream().map(this::toItem).toList(),
                 repository.facetCounts(effective.keyword()));
+    }
+
+    /**
+     * 搜索框联想词：只按商品名匹配，销量高优先，最多 {@value #SUGGEST_LIMIT} 条。
+     *
+     * <p>空关键词直接返回空列表（不把整个商品库倒给前端），超长关键词按搜索接口的同一上限截断。
+     */
+    public List<String> suggest(String keyword) {
+        String clean = keyword == null ? "" : keyword.trim();
+        if (clean.length() > ProductQuery.KEYWORD_MAX_LENGTH) {
+            clean = clean.substring(0, ProductQuery.KEYWORD_MAX_LENGTH);
+        }
+        return clean.isEmpty() ? List.of() : repository.suggest(clean, SUGGEST_LIMIT);
     }
 
     private SearchProductItem toItem(ProductRow row) {

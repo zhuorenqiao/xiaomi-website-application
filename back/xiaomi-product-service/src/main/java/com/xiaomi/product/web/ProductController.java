@@ -62,6 +62,19 @@ public class ProductController {
     }
 
     /**
+     * 搜索框联想词（参考 mi.com 搜索下拉）：按关键词返回命中的商品名，销量高优先，最多 10 条。
+     *
+     * <p>只匹配商品名，前端可稳定地把命中片段标成橙色；关键词留空返回空列表。
+     *
+     * @param keyword 用户已输入的关键词
+     * @return 统一响应外层，{@code data} 为联想词数组
+     */
+    @GetMapping("/suggest")
+    public ApiResponse<List<String>> suggest(@RequestParam(name = "keyword", required = false) String keyword) {
+        return ApiResponse.ok(productService.suggest(keyword));
+    }
+
+    /**
      * 商品详情（参考 mi.com/shop/buy/detail?product_id=）：按主键返回单个商品的详情聚合数据。
      *
      * @param id 商品主键；缺失或非数字时返回业务错误，避免依赖容器默认的 400

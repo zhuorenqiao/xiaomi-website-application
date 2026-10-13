@@ -8,6 +8,7 @@ import type { ProductSortValue } from '../types/product'
  * 注意：这里配置的是「接口基址」，具体接口由基址拼接：
  *   首页栏目  GET {base}/sections
  *   商品搜索  GET {base}/search?keyword=&category=&sort=&page=&size=
+ *   搜索联想  GET {base}/suggest?keyword=
  *   商品详情  GET {base}/detail?id=
  *   购物车    {host}/api/cart（基址里的 /products 换成 /cart）
  */
@@ -15,6 +16,7 @@ const API_BASE = import.meta.env?.VITE_PRODUCT_API_BASE || 'http://localhost:886
 
 export const PRODUCT_SECTIONS_URL = `${API_BASE}/sections`
 export const PRODUCT_SEARCH_URL = `${API_BASE}/search`
+export const PRODUCT_SUGGEST_URL = `${API_BASE}/suggest`
 export const PRODUCT_DETAIL_URL = `${API_BASE}/detail`
 // 购物车与商品同服务不同路径：把基址尾部的 /products 换成 /cart
 export const PRODUCT_CART_URL = API_BASE.replace(/\/products\/?$/, '/cart')

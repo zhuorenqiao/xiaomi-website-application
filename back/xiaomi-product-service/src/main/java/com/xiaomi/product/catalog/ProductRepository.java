@@ -73,6 +73,12 @@ public class ProductRepository {
         return mapper.selectFacets(likePattern(keyword));
     }
 
+    /** 搜索联想词：商品名命中关键词的候选，按销量倒序取前 limit 个；空关键词不发查询 */
+    public List<String> suggest(String keyword, int limit) {
+        String pattern = likePattern(keyword);
+        return pattern == null ? List.of() : mapper.selectSuggestions(pattern, limit);
+    }
+
     // ---------------- 商品详情 ----------------
 
     /** 按主键取单个商品行；不存在时返回 null（service 据此回「商品不存在」） */

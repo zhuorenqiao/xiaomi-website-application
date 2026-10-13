@@ -1,6 +1,12 @@
 import type { ApiResponse } from '../types/api'
 import type { ProductDetail, ProductQuery, ProductSearchResult, ProductSection } from '../types/product'
-import { DEFAULT_PAGE_SIZE, PRODUCT_DETAIL_URL, PRODUCT_SEARCH_URL, PRODUCT_SECTIONS_URL } from '../utils/productConfig'
+import {
+  DEFAULT_PAGE_SIZE,
+  PRODUCT_DETAIL_URL,
+  PRODUCT_SEARCH_URL,
+  PRODUCT_SECTIONS_URL,
+  PRODUCT_SUGGEST_URL,
+} from '../utils/productConfig'
 
 /**
  * 统一请求 + 解包：后端商品接口一律返回 { success, message?, data }，
@@ -47,6 +53,17 @@ export function searchProducts(query: ProductQuery = {}, signal?: AbortSignal): 
   params.set('page', String(page))
   params.set('size', String(size))
   return getData<ProductSearchResult>(`${PRODUCT_SEARCH_URL}?${params.toString()}`, signal)
+}
+
+/**
+ * 搜索框联想词：后端只按商品名匹配，销量高优先，最多 10 条。
+ * @param keyword 已输入的关键词
+ * @param signal 可选的中止信号（连续输入时取消上一次在途请求）
+ */
+export function suggestProducts(keyword: string, signal?: AbortSignal): Promise<string[]> {
+  const params = new URLSearchParams()
+  params.set('keyword', keyword)
+  return getData<string[]>(`${PRODUCT_SUGGEST_URL}?${params.toString()}`, signal)
 }
 
 /**
