@@ -8,7 +8,7 @@ spring:
   # ---------- 商品库（MySQL 8.4，本地由 back/db/docker-compose.yml 拉起） ----------
   datasource:
     # 三项均可用同名环境变量覆盖（生产/联调用），默认值仅为本地开发容器账号
-    url: ${PRODUCT_DB_URL:jdbc:mysql://127.0.0.1:3306/xiaomi_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    url: ${PRODUCT_DB_URL:jdbc:mysql://127.0.0.1:3307/xiaomi_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
     username: ${PRODUCT_DB_USERNAME:xiaomi}
     password: ${PRODUCT_DB_PASSWORD:xiaomi_dev}
     hikari:

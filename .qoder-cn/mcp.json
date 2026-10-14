@@ -1,0 +1,15 @@
+{
+	"mcpServers": {
+		"mcp_server_mysql": {
+			"command": "npx",
+			"args": ["-y", "@benborla29/mcp-server-mysql"],
+			"env": {
+				"MYSQL_HOST": "127.0.0.1",
+				"MYSQL_PORT": "3307",
+				"MYSQL_USER": "xiaomi",
+				"MYSQL_PASS": "xiaomi_dev",
+				"MYSQL_DB": "xiaomi_product"
+			}
+		}
+	}
+}
